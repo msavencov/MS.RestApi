@@ -39,6 +39,7 @@ namespace MS.RestApi.Generators.Utils
                 EndPointAttribute = context.Compilation.GetTypeByMetadataName("MS.RestApi.Abstractions.EndPointAttribute"),
                 Request = context.Compilation.GetTypeByMetadataName("MS.RestApi.Abstractions.Request"),
                 
+                ClientRequestHandlerInterface = context.Compilation.GetTypeByMetadataName("MS.RestApi.Client.IRequestHandler"),
                 CancellationToken = context.Compilation.GetTypeByMetadataName("System.Threading.CancellationToken"),
                 Task = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task"),
                 TaskGeneric = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1"),
