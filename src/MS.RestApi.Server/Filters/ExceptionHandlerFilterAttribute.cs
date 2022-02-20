@@ -2,32 +2,19 @@
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MS.RestApi.Error;
 using MS.RestApi.Error.BadRequest;
+using MS.RestApi.Server.Exceptions;
 
-namespace ApiGen.Server.Filters
+namespace MS.RestApi.Server.Filters
 {
-    public class ExceptionHandlerFilterAttribute : ActionFilterAttribute
+    public class ExceptionHandlerFilterAttribute : ExceptionFilterAttribute
     {
-        public override void OnResultExecuting(ResultExecutingContext context)
-        {
-            if (context.ModelState.IsValid == false)
-            {
-                var error = new ValidationApiError
-                {
-                    Code = 400,
-                    CodeName = "Validation",
-                    MessageFormat = "Validation errors occurred while executing request.",
-                    ValidationErrors = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-                };
-
-                context.Result = new ObjectResult(error);
-            }
-        }
-
-        public override void OnActionExecuted(ActionExecutedContext context)
+        public override void OnException(ExceptionContext context)
         {
             if (context.ExceptionHandled)
             {
@@ -46,15 +33,27 @@ namespace ApiGen.Server.Filters
             {
                 exception = ae.InnerException;
             }
-            
+
             if (exception == null)
             {
                 return;
             }
-            
+
             if (exception is ApiException apiException)
             {
                 error = apiException.Error;
+            }
+
+            if (exception is InvalidModelStateException {ModelState: {ErrorCount: > 0} state})
+            {
+                error = new ValidationApiError
+                {
+                    Code = 2,
+                    CodeName = "Validation",
+                    MessageFormat = $"Validation errors occurred. See the 'ValidationErrors' property for details.",
+                    ValidationErrors = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray()),
+                    LogMessage = BuildValidationErrorMessage(state),
+                };
             }
 
             if (error is null)
@@ -63,22 +62,31 @@ namespace ApiGen.Server.Filters
                 {
                     Code = 1,
                     CodeName = "Unhandled",
-                    MessageFormat = "An unhandled error occured.",
+                    MessageFormat = $"An unhandled error occured. {exception.Message}",
                     LogMessage = exception.ToString(),
                 };
             }
 
-            if (context.Result is ObjectResult { Value: ValidationApiError })
-            {
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            }
-            else
-            {
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }
-            
             context.Result = new ObjectResult(error);
+            context.HttpContext.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
             context.ExceptionHandled = true;
+        }
+
+        private string BuildValidationErrorMessage(ModelStateDictionary modelState)
+        {
+            var sb = new StringBuilder().AppendLine("Model validation errors occured.");
+
+            foreach (var item in modelState)
+            {
+                sb.AppendLine($"Path: {item.Key}");
+
+                foreach (var error in item.Value.Errors)
+                {
+                    sb.AppendLine($"\t{error.ErrorMessage}");
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using MS.RestApi.Abstractions;
+using MS.RestApi.Client.Exceptions;
+using MS.RestApi.Error;
+using MS.RestApi.Error.BadRequest;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MS.RestApi.Client
 {
@@ -24,7 +29,7 @@ namespace MS.RestApi.Client
         public async Task<TResult> HandleAsync<TModel, TResult>(Method method, string resource, TModel model, CancellationToken ct)
         {
             var response = await ExecuteAsync(method, resource, model, ct);
-            var responseBody = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync();
 
             if (typeof(TResult) == typeof(string))
             {
@@ -66,15 +71,71 @@ namespace MS.RestApi.Client
 
             try
             {
-                return response.EnsureSuccessStatusCode();
+                response.EnsureSuccessStatusCode();
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                await OnRequestExceptionAsync(response, e);
-                throw;
+                await OnRequestExceptionAsync(response, exception);
+                
+                throw new ApiRemoteErrorException
+                {
+                    Error = await BuildApiError(response),
+                }; 
             }
+            
+            return response;
         }
 
+        private async Task<ApiError> BuildApiError(HttpResponseMessage response)
+        {
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var responseObj = (JObject)null;
+            
+            if (response.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                try
+                {
+                    responseObj = JObject.Parse(responseBody);
+                }
+                catch (JsonReaderException)
+                {
+                    return new ApiError
+                    {
+                        Code = -2,
+                        CodeName = "MalformedResponseError",
+                        MessageFormat = "Failed to parse API error response.",
+                        LogMessage = $"The response body seems to be not a valid JSON format: {responseBody}",
+                    };
+                }
+
+                if (responseObj.ContainsKey("code"))
+                {
+                    if (responseObj.Value<int>("code") == 2)
+                    {
+                        return responseObj.ToObject<ValidationApiError>();
+                    }
+                    
+                    return responseObj.ToObject<ApiError>();
+                }
+                
+                return new ApiError
+                {
+                    Code = -3,
+                    CodeName = "UnknownResponseError",
+                    MessageFormat = "Failed to parse API error response.",
+                    LogMessage = $"The response body seems to be not a valid JSON format: {responseBody}",
+                };
+            }
+
+            return new ApiError
+            {
+                Code = -1,
+                CodeName = "UnknownStatusCode",
+                MessageFormat = $"Unknown response code: {(int)response.StatusCode} {response.StatusCode}.",
+                LogMessage = $"Bad response received from the API server: {responseBody}",
+            };
+        }
+        
         protected virtual Task OnRequestMessageSentAsync(HttpResponseMessage response)
         {
             return Task.CompletedTask;
@@ -89,6 +150,5 @@ namespace MS.RestApi.Client
         {
             return Task.CompletedTask;
         }
-
     }
 }

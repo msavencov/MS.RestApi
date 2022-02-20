@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <MSBuildWarningsAsErrors>CS8785</MSBuildWarningsAsErrors>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MS.RestApi\MS.RestApi.csproj" />
+    <ProjectReference Include="..\..\src\MS.RestApi.Client\MS.RestApi.Client.csproj" />
+    <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\contract\contract.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <CompilerVisibleProperty Include="ApiGenAssemblyToScan" />
+    <CompilerVisibleProperty Include="ApiGenGenerateClient" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <ApiGenAssemblyToScan>contract</ApiGenAssemblyToScan>
+    <ApiGenGenerateClient>true</ApiGenGenerateClient>
+  </PropertyGroup>
+</Project>
