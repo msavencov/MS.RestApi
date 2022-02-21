@@ -1,6 +1,6 @@
 using System;
 
-namespace MS.RestApi.Generators.Utils
+namespace MS.RestApi.SourceGenerator.Utils
 {
     internal class ApiGenException : Exception
     {

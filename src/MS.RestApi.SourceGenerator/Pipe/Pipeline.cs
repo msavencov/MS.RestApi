@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace MS.RestApi.Generators.Pipe
+namespace MS.RestApi.SourceGenerator.Pipe
 {
     internal class Pipeline<TContext>
     {

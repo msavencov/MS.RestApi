@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.Abstractions;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Extensions
+namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class AttributeDataExtensions
     {
@@ -13,7 +12,7 @@ namespace MS.RestApi.Generators.Extensions
         {
             var endPoint = new ApiEndPoint();
 
-            endPoint.Method = (Abstractions.Method)attributeData.ConstructorArguments[0].GetConstantValue();
+            endPoint.Method = (Method)attributeData.ConstructorArguments[0].GetConstantValue();
             endPoint.Path = (string)attributeData.ConstructorArguments[1].GetConstantValue();
             endPoint.Service = (string)attributeData.ConstructorArguments[2].GetConstantValue();
             

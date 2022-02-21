@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using MS.RestApi.Abstractions;
 
-namespace MS.RestApi.Generators.Utils
+namespace MS.RestApi.SourceGenerator.Utils
 {
     internal class ApiGenRequest
     {
@@ -32,11 +35,44 @@ namespace MS.RestApi.Generators.Utils
             return $"{prefix}/{route}";
         }
     }
-
+    
     internal class ApiEndPoint
     {
         public Method Method { get; set; }
         public string Service { get; set; }
         public string Path { get; set; }
+    }
+
+    internal class ApiGenService
+    {
+        public string ServiceName { get; init; }
+        public ApiGenRequest[] Operations { get; init; }
+    }
+    
+    internal class ApiGenRequestCollection : HashSet<ApiGenRequest>
+    {
+        private readonly Lazy<ApiGenService[]> _services;
+
+        public ApiGenRequestCollection()
+        {
+            _services = new Lazy<ApiGenService[]>(ServicesFactory);
+        }
+
+        private ApiGenService[] ServicesFactory()
+        {
+            var services = from service in this
+                           group service by service.EndPoint.Service into s
+                           select new ApiGenService
+                           {
+                               ServiceName = s.Key,
+                               Operations = s.ToArray()
+                           };
+            return services.ToArray();
+        }
+
+        public ApiGenService[] AsServices()
+        {
+            return _services.Value;
+        }
     }
 }

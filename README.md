@@ -210,6 +210,7 @@ Below is the list of generator configuration properties.
 | ApiGenGenerateClient      | bool   | False     | Generate client interfaces and their implementations                                  |
 | ApiGenApiName             | string | Generated | The namespace prefix for all generated types                                          |
 | ApiGenApiBaseRoute        | string | api       | The base route for generated endpoints                                                |
+| ApiGenUseMediatorHandlers | bool   | False     | By setting property to true controllers will use IMediator for dispatching requests   | 
 
 Assume that the root namespaces of assembly is referencing source generator is `My.Company.Api`
 

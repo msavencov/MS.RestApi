@@ -1,10 +1,7 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using MS.RestApi.Abstractions;
-using MS.RestApi.Generators.Extensions;
+﻿using Microsoft.CodeAnalysis;
+using MS.RestApi.SourceGenerator.Extensions;
 
-namespace MS.RestApi.Generators.Utils
+namespace MS.RestApi.SourceGenerator.Utils
 {
     internal class ApiGenSymbols
     {
@@ -29,7 +26,8 @@ namespace MS.RestApi.Generators.Utils
         public ISymbol ArgumentNullException { get; private set; }
         public ISymbol ServiceDescriptor { get; private set; }
         public ISymbol ServiceLifetime { get; private set; }
-
+        public ISymbol Mediator { get; private set; }
+        
         public static ApiGenSymbols Init(GeneratorExecutionContext context)
         {
             var symbols = new ApiGenSymbols
@@ -56,6 +54,7 @@ namespace MS.RestApi.Generators.Utils
                 ArgumentNullException = context.Compilation.GetTypeByMetadataName("System.ArgumentNullException"),
                 ServiceDescriptor = context.Compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceDescriptor"),
                 ServiceLifetime = context.Compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime"),
+                Mediator = context.Compilation.GetTypeByMetadataName("MediatR.IMediator")
             };
             
             return symbols;
@@ -64,7 +63,7 @@ namespace MS.RestApi.Generators.Utils
         public static (string InterfaceName, string ContainingNamespace) GetClientRequestHandlerInterface(ApiGenSymbols symbols, ApiGenConfig config)
         {
             var requestHandlerInterfaceName = symbols.ClientRequestHandlerInterface.Name.Insert(1, config.ApiName);
-            var requestHandlerInterfaceNamespace = config.ClientInterfaceNamespace;
+            var requestHandlerInterfaceNamespace = config.ClientRootNamespace;
 
             return (requestHandlerInterfaceName, requestHandlerInterfaceNamespace);
 

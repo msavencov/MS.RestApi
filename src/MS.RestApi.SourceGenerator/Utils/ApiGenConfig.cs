@@ -1,8 +1,8 @@
 using System;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Generators.Extensions;
+using MS.RestApi.SourceGenerator.Extensions;
 
-namespace MS.RestApi.Generators.Utils
+namespace MS.RestApi.SourceGenerator.Utils
 {
     internal class ApiGenConfig
     {
@@ -13,19 +13,25 @@ namespace MS.RestApi.Generators.Utils
         public string ApiBaseRoute { get; set; }
         
         public bool GenerateClient { get; private set; }
-        public string ClientInterfaceNamespace { get; set; }
-        public string ClientImplementationNamespace { get; set; }
-        public string ClientExtensionsNamespace { get; set; }
+        public string ClientRootNamespace { get; private set; }
+        public string ClientServicesNamespace { get; private set; }
+        public string ClientServicesImplNamespace { get; private set; }
+        public string ClientExtensionsNamespace { get; private set; }
         
         public bool GenerateControllers { get; private set; }
-        public string ControllerNamespace { get; set; }
-        public string ControllerServiceNamespace { get; set; }
-        
+        public bool UseMediatorHandlers { get; private set; }
+        public string ServerRootNamespace { get; private set; }
+        public string ServerControllerNamespace { get; private set; }
+        public string ServerServiceNamespace { get; private set; }
+        public string ServerServiceImplNamespace { get; private set; }
+        public string ServerExtensionsNamespace { get; private set; }
+
         public static ApiGenConfig Init(GeneratorExecutionContext context)
         {
             var config = new ApiGenConfig
             {
                 GenerateControllers = context.GetApiGenBuildProperty("GenerateControllers").Parse<bool>(),
+                UseMediatorHandlers = context.GetApiGenBuildProperty("UseMediatorHandlers").Parse<bool>(),
                 GenerateClient = context.GetApiGenBuildProperty("GenerateClient").Parse<bool>(),
                 AssemblyToScan = context.GetApiGenBuildProperty("AssemblyToScan").Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries).Parse<string>(),
                 ApiName = context.GetApiGenBuildProperty("ApiName") ?? "Generated",
@@ -34,30 +40,16 @@ namespace MS.RestApi.Generators.Utils
             };
             config.RootNamespace += $".{config.ApiName}";
             
-            if (string.IsNullOrEmpty(config.ControllerNamespace))
-            {
-                config.ControllerNamespace = $"{config.RootNamespace}.Controllers";
-            }
-
-            if (string.IsNullOrEmpty(config.ControllerServiceNamespace))
-            {
-                config.ControllerServiceNamespace = $"{config.RootNamespace}.Services.Abstractions";
-            }
+            config.ClientRootNamespace = $"{config.RootNamespace}.Client";
+            config.ClientServicesNamespace = $"{config.ClientRootNamespace}.Services";
+            config.ClientServicesImplNamespace = $"{config.ClientRootNamespace}.ServicesImpl";
+            config.ClientExtensionsNamespace = $"{config.ClientRootNamespace}.Extensions";
             
-            if (string.IsNullOrEmpty(config.ClientInterfaceNamespace))
-            {
-                config.ClientInterfaceNamespace = $"{config.RootNamespace}.Client.Abstractions";
-            }
-
-            if (string.IsNullOrEmpty(config.ClientImplementationNamespace))
-            {
-                config.ClientImplementationNamespace = $"{config.RootNamespace}.{config.ApiName}.Client";
-            }
-
-            if (string.IsNullOrEmpty(config.ClientExtensionsNamespace))
-            {
-                config.ClientExtensionsNamespace = $"{config.ClientImplementationNamespace}.Extensions";
-            }
+            config.ServerRootNamespace = $"{config.RootNamespace}.Server";
+            config.ServerControllerNamespace = $"{config.ServerRootNamespace}.Controllers";
+            config.ServerServiceNamespace = $"{config.ServerRootNamespace}.Services";
+            config.ServerServiceImplNamespace = $"{config.ServerRootNamespace}.ServicesImpl";
+            config.ServerExtensionsNamespace = $"{config.ServerRootNamespace}.Extensions";
             
             return config;
         }

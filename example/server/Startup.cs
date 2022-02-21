@@ -1,12 +1,11 @@
 using System;
 using System.IO;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using MS.RestApi.Server;
-using server.Generated.Services.Abstractions;
-using server.Services;
 
 namespace server
 {
@@ -16,8 +15,7 @@ namespace server
         {
             services.AddControllers()
                     .AddApiMvcOptions();
-            services.AddScoped<IAccountService, AccountService>();
-
+            
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {

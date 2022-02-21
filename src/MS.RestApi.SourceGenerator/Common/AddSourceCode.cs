@@ -1,7 +1,8 @@
-using MS.RestApi.Generators.Pipe;
-using MS.RestApi.Generators.Utils;
+using System;
+using MS.RestApi.SourceGenerator.Pipe;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Common
+namespace MS.RestApi.SourceGenerator.Common
 {
     internal class AddSourceCode : IMiddleware<ApiGenContext>
     {
@@ -9,7 +10,7 @@ namespace MS.RestApi.Generators.Common
         {
             foreach (var sourceCode in context.SourceCode)
             {
-                context.Context.AddSource(sourceCode.Name, sourceCode.Source);
+                context.Context.AddSource(sourceCode.Name, sourceCode.Source.Insert(0, "#pragma warning disable CS1591" + Environment.NewLine));
             }
         }
     }

@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Generators.Extensions;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Extensions;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators
+namespace MS.RestApi.SourceGenerator
 {
     [Generator]
     internal class ApiGenGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            // context.RegisterForPostInitialization(c =>
-            // {
-            //     c.AddSource("ApiGenOptionsAttribute.cs", typeof(ApiGenGenerator).Assembly.ReadCodeResource("ApiGenOptionsAttribute"));
-            // });
+            
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
+            //System.Threading.SpinWait.SpinUntil(() => System.Diagnostics.Debugger.IsAttached);
+            
             try
             {
                 var apiGenContext = ApiGenContext.Create(context);

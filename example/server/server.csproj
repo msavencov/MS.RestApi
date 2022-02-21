@@ -3,16 +3,26 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <MSBuildWarningsAsErrors>CS8785</MSBuildWarningsAsErrors>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <CompilerVisibleProperty Include="ApiGenGenerateControllers" />
     <CompilerVisibleProperty Include="ApiGenAssemblyToScan" />
+    <CompilerVisibleProperty Include="ApiGenGenerateControllers" />
+    <CompilerVisibleProperty Include="ApiGenUseMediatorHandlers" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <ApiGenGenerateControllers>true</ApiGenGenerateControllers>
+    <ApiGenAssemblyToScan>contract</ApiGenAssemblyToScan>
+    <ApiGenUseMediatorHandlers>true</ApiGenUseMediatorHandlers>
+  </PropertyGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\MS.RestApi\MS.RestApi.csproj" />
@@ -20,14 +30,7 @@
     <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\contract\contract.csproj" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <ApiGenGenerateControllers>true</ApiGenGenerateControllers>
-    <ApiGenAssemblyToScan>contract</ApiGenAssemblyToScan>
-  </PropertyGroup>
-
-
-
+  
   <PropertyGroup>
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>

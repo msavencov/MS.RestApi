@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace MS.RestApi.Generators.Extensions
+namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal class DiagnosticError
     {

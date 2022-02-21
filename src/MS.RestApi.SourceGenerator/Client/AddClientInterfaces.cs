@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MS.RestApi.Generators.Builder;
-using MS.RestApi.Generators.Common;
-using MS.RestApi.Generators.Extensions;
-using MS.RestApi.Generators.Pipe;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Builder;
+using MS.RestApi.SourceGenerator.Common;
+using MS.RestApi.SourceGenerator.Extensions;
+using MS.RestApi.SourceGenerator.Pipe;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Client
+namespace MS.RestApi.SourceGenerator.Client
 {
     internal class AddClientInterfaces : IMiddleware<ApiGenContext>
     {
@@ -26,8 +26,6 @@ namespace MS.RestApi.Generators.Client
         {
             var config = context.Config;
             var symbols = context.KnownSymbols;
-            var apiName = config.ApiName;
-
             var builder = new StringBuilder();
             var writer = new IndentedWriter(builder);
 
@@ -43,27 +41,19 @@ namespace MS.RestApi.Generators.Client
             
             context.SourceCode.Add(new ApiGenSourceCode
             {
-                Name = $"ApiClient.{apiName}.Abstractions.{interfaceName}.cs",
+                Name = $"{config.ClientRootNamespace}.{interfaceName}.cs",
                 Source = builder.ToString()
             });
         }
 
         private void BuildInterfaceSourceCode(ApiGenContext context)
         {
-            var query = from request in context.Requests
-                        group request by request.EndPoint.Service into actions
-                        select new
-                        {
-                            GroupName = actions.Key,
-                            Actions = actions
-                        };
-
-            foreach (var service in query)
+            foreach (var service in context.Requests.AsServices())
             {
                 var sourceCode = new ApiGenSourceCode
                 {
-                    Name = $"ApiClient.{context.Config.ApiName}.Abstractions.{service.GroupName}.cs",
-                    Source = BuildInterfaceSourceCode(service.GroupName, service.Actions, context),
+                    Name = $"{context.Config.ClientServicesNamespace}.{service.ServiceName}.cs",
+                    Source = BuildInterfaceSourceCode(service.ServiceName, service.Operations, context),
                 };
                 
                 context.SourceCode.Add(sourceCode);
@@ -78,7 +68,7 @@ namespace MS.RestApi.Generators.Client
             var config = context.Config;
             var symbol = context.KnownSymbols;
             
-            writer.WriteLine($"namespace {config.ClientInterfaceNamespace}");
+            writer.WriteLine($"namespace {config.ClientRootNamespace}");
             writer.WriteBlock(namespaceBuilder =>
             {
                 namespaceBuilder.WriteLine($"public interface {ApiGenRequest.BuildInterfaceName(group)} : {symbol.IApiService.FullName()}");

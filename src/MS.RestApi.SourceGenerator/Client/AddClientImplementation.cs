@@ -1,27 +1,21 @@
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Generators.Builder;
-using MS.RestApi.Generators.Common;
-using MS.RestApi.Generators.Extensions;
-using MS.RestApi.Generators.Pipe;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Builder;
+using MS.RestApi.SourceGenerator.Common;
+using MS.RestApi.SourceGenerator.Extensions;
+using MS.RestApi.SourceGenerator.Pipe;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Client
+namespace MS.RestApi.SourceGenerator.Client
 {
     internal class AddClientImplementation : IMiddleware<ApiGenContext>
     {
         public void Execute(ApiGenContext context)
         {
-            var services = from request in context.Requests
-                           group request by request.EndPoint.Service into rg
-                           select new
-                           {
-                               Group = rg.Key,
-                               Actions = rg.AsEnumerable()
-                           };
             var config = context.Config;
             var symbol = context.KnownSymbols;
+            var services = context.Requests.AsServices();
 
             var symbolComparer = SymbolEqualityComparer.Default;
             var requestHandlerInterface = ApiGenSymbols.GetClientRequestHandlerInterface(symbol, config);
@@ -33,12 +27,12 @@ namespace MS.RestApi.Generators.Client
                 var builder = new StringBuilder();
                 var writer = new IndentedWriter(builder, 0);
 
-                var clientApiName = ApiGenRequest.BuildClientName(service.Group);
-                var clientInterfaceName = ApiGenRequest.BuildInterfaceName(service.Group);
-                var clientInterfaceFullName = $"{config.ClientInterfaceNamespace}.{clientInterfaceName}";
+                var clientApiName = ApiGenRequest.BuildClientName(service.ServiceName);
+                var clientInterfaceName = ApiGenRequest.BuildInterfaceName(service.ServiceName);
+                var clientInterfaceFullName = $"{config.ClientRootNamespace}.{clientInterfaceName}";
                 var cancellationTokenType = symbol.CancellationToken.FullName();
                 
-                writer.WriteLine($"namespace {config.ClientImplementationNamespace}");
+                writer.WriteLine($"namespace {config.ClientServicesImplNamespace}");
                 writer.WriteBlock(nsw =>
                 {
                     nsw.WriteLine($"internal class {clientApiName} : {clientInterfaceFullName}");
@@ -52,7 +46,7 @@ namespace MS.RestApi.Generators.Client
                             mw.WriteLine("_httpRequestHandler = httpRequestHandler;");
                         });
 
-                        foreach (var action in service.Actions)
+                        foreach (var action in service.Operations)
                         {
                             var responseType = action.GetResponseTypeName(context);
                             var requestType = action.Request.FullName();
@@ -79,7 +73,7 @@ namespace MS.RestApi.Generators.Client
                 
                 var sourceCode = new ApiGenSourceCode
                 {
-                    Name = $"ApiClient.{config.ApiName}.Impl.{service.Group}.cs",
+                    Name = $"{config.ClientServicesImplNamespace}.{service.ServiceName}.cs",
                     Source = builder.ToString()
                 };
                 

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace MS.RestApi.Generators.Extensions
+namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class StringExtensions
     {

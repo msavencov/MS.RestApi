@@ -1,7 +1,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace MS.RestApi.Generators.Extensions
+namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class AttributeExtensions
     {

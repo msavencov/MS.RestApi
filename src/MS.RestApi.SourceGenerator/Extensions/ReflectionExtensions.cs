@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Reflection;
 
-namespace MS.RestApi.Generators.Extensions
+namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class ReflectionExtensions
     {
-        public static string ReadCodeResource(this Assembly assembly, string resourceName)
+        public static string ReadResource(this Assembly assembly, string resourceNameEndsWith)
         {
-            var name = assembly.GetManifestResourceNames().Single(t => t.EndsWith(resourceName));
+            var name = assembly.GetManifestResourceNames().Single(t => t.EndsWith(resourceNameEndsWith));
             var stream = assembly.GetManifestResourceStream(name);
 
             if (stream is {Length: > 0})

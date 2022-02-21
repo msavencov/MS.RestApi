@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace MS.RestApi.Generators.Utils
+namespace MS.RestApi.SourceGenerator.Utils
 {
     internal class ApiGenContext
     {
         public ApiGenConfig Config { get; private init; }
         public ApiGenSymbols KnownSymbols { get; private init; }
         public GeneratorExecutionContext Context { get; private init; }
-        public HashSet<ApiGenRequest> Requests { get; set; } = new();
+        public ApiGenRequestCollection Requests { get; set; } = new();
         public HashSet<ApiGenSourceCode> SourceCode { get; set; } = new();
 
         public static ApiGenContext Create(GeneratorExecutionContext context)

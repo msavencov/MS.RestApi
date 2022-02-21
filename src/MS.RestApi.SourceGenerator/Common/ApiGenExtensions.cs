@@ -1,8 +1,8 @@
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Generators.Extensions;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Extensions;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Common
+namespace MS.RestApi.SourceGenerator.Common
 {
     internal static class ApiGenExtensions
     {

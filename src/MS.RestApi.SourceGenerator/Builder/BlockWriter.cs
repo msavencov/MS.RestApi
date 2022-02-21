@@ -1,14 +1,18 @@
 using System;
 using System.Text;
-using MS.RestApi.Generators.Extensions;
+using MS.RestApi.SourceGenerator.Extensions;
 
-namespace MS.RestApi.Generators.Builder
+namespace MS.RestApi.SourceGenerator.Builder
 {
     internal class IndentedWriter
     {
+        public int IndentLevel => _level;
+        
         private readonly StringBuilder _builder;
         private readonly int _level;
 
+        public IndentedWriter() : this(new StringBuilder(), 0){}
+        public IndentedWriter(int level) : this(new StringBuilder(), level){}
         public IndentedWriter(StringBuilder builder) : this(builder, 0){}
         public IndentedWriter(StringBuilder builder, int level)
         {
@@ -30,9 +34,14 @@ namespace MS.RestApi.Generators.Builder
             
             inner(blockWriter);
             
-            _builder.Append(block.ToString());
+            _builder.Append(block);
             
             WriteLine(close);
+        }
+
+        public override string ToString()
+        {
+            return _builder.ToString();
         }
     }
 }

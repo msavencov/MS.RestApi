@@ -1,4 +1,4 @@
-namespace MS.RestApi.Generators.Pipe
+namespace MS.RestApi.SourceGenerator.Pipe
 {
     internal interface IMiddleware<TContext>
     {

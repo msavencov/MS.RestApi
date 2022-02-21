@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MediatR;
 using MS.RestApi.Abstractions;
 
-namespace contract
+namespace contract.Account
 {
     /// <summary>
     /// Signin user and generate access token 
     /// </summary>
-    [EndPoint(Method.Post, "account/signin/local", "Account")]
-    public class Signin : Request<SigninResponse>
+    [EndPoint(Method.Post, "account/sign-in/local", "Account")]
+    public class SignInLocal : Request<SignInResponse>, IRequest<SignInResponse>
     {
         /// <summary>
         /// The user's account email 
@@ -20,14 +21,5 @@ namespace contract
         /// </summary>
         [Required, MinLength(6), MaxLength(50)]
         public string Password { get; set; }
-    }
-
-    /// <summary/>
-    public class SigninResponse
-    {
-        /// <summary>
-        /// The user's access token
-        /// </summary>
-        public string AccessToken { get; set; }
     }
 }

@@ -1,10 +1,10 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Generators.Extensions;
-using MS.RestApi.Generators.Pipe;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Extensions;
+using MS.RestApi.SourceGenerator.Pipe;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Common
+namespace MS.RestApi.SourceGenerator.Common
 {
     internal class AddApiRequests : IMiddleware<ApiGenContext>
     {

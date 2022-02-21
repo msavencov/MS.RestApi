@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Extensions
+namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class CompilationExtensions
     {
@@ -108,16 +108,6 @@ namespace MS.RestApi.Generators.Extensions
         public static string FullName(this ISymbol symbol)
         {
             return symbol.ToDisplayString();
-        }
-        
-        public static ISymbol TryGetTypeByClrType(this Compilation compilation, Type type)
-        {
-            return compilation.GetTypeByMetadataName(type.FullName);
-        }
-        
-        public static ISymbol GetTypeByClrType(this Compilation compilation, Type type)
-        {
-            return compilation.TryGetTypeByClrType(type) ?? throw new ApiGenTypeNotFoundException(11, type);
         }
     }
 }

@@ -1,10 +1,10 @@
-using MS.RestApi.Generators.Client;
-using MS.RestApi.Generators.Common;
-using MS.RestApi.Generators.Pipe;
-using MS.RestApi.Generators.Server;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Client;
+using MS.RestApi.SourceGenerator.Common;
+using MS.RestApi.SourceGenerator.Pipe;
+using MS.RestApi.SourceGenerator.Server;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators
+namespace MS.RestApi.SourceGenerator
 {
     internal class ApiGenGeneratorPipe : Pipeline<ApiGenContext>
     {
@@ -14,8 +14,17 @@ namespace MS.RestApi.Generators
             
             if (context.Config.GenerateControllers)
             {
-                Add<AddControllers>();
+                if (context.Config.UseMediatorHandlers)
+                {
+                    Add<AddControllersWithMediator>();
+                }
+                else
+                {
+                    Add<AddControllers>();
+                    Add<AddServices>();
+                }
             }
+            
             if (context.Config.GenerateClient)
             {
                 Add<AddClientInterfaces>();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace MS.RestApi.Generators.Extensions
+namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class EnumerableExtensions
     {
@@ -12,6 +12,11 @@ namespace MS.RestApi.Generators.Extensions
             {
                 yield return item;
             }
+        }
+        
+        public static string Join(this IEnumerable<string> source, string delimiter)
+        {
+            return string.Join(delimiter, source);
         }
     }
 }

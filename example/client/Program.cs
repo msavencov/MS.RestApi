@@ -2,10 +2,11 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using client.Generated.Client;
+using client.Generated.Client.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using client.Generated.Client.Abstractions;
-using client.Generated.Generated.Client.Extensions;
 using contract;
+using contract.Account;
 using MS.RestApi.Client;
 using MS.RestApi.Client.Exceptions;
 
@@ -19,9 +20,10 @@ namespace client
             var accountApi = services.GetRequiredService<IAccountApi>();
             try
             {
-                var result = await accountApi.SigninAsync(new Signin(), CancellationToken.None);
+                var result1 = await accountApi.SignInLocalAsync(new SignInLocal(), CancellationToken.None);
+                await accountApi.SignOutAsync(new SignOut());
             }
-            catch (ApiRemoteErrorException errorException)
+            catch (ApiRemoteErrorException)
             {
                 // handle API error
             }

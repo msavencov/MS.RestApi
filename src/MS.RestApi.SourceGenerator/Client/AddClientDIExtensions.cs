@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Text;
-using MS.RestApi.Generators.Builder;
-using MS.RestApi.Generators.Extensions;
-using MS.RestApi.Generators.Pipe;
-using MS.RestApi.Generators.Utils;
+using MS.RestApi.SourceGenerator.Builder;
+using MS.RestApi.SourceGenerator.Extensions;
+using MS.RestApi.SourceGenerator.Pipe;
+using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.Generators.Client
+namespace MS.RestApi.SourceGenerator.Client
 {
     internal class AddClientDIExtensions : IMiddleware<ApiGenContext>
     {
@@ -42,8 +42,8 @@ namespace MS.RestApi.Generators.Client
                         
                         foreach (var service in services)
                         {
-                            var serviceName = $"{config.ClientInterfaceNamespace}.{ApiGenRequest.BuildInterfaceName(service)}";
-                            var serviceImplName = $"{config.ClientImplementationNamespace}.{ApiGenRequest.BuildClientName(service)}";
+                            var serviceName = $"{config.ClientRootNamespace}.{ApiGenRequest.BuildInterfaceName(service)}";
+                            var serviceImplName = $"{config.ClientServicesImplNamespace}.{ApiGenRequest.BuildClientName(service)}";
                             
                             mw.WriteLine($"services.Add(new {serviceDescriptorName}(typeof({serviceName}), typeof({serviceImplName}), options.ServiceLifetime));");
                         }
@@ -62,7 +62,7 @@ namespace MS.RestApi.Generators.Client
 
             var sourceCode = new ApiGenSourceCode
             {
-                Name = $"ApiClient.{config.ApiName}.Extensions.Module.cs",
+                Name = $"{config.ClientExtensionsNamespace}.Module.cs",
                 Source = builder.ToString()
             };
             context.SourceCode.Add(sourceCode);

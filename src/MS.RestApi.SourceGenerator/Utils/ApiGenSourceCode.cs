@@ -1,4 +1,4 @@
-namespace MS.RestApi.Generators.Utils
+namespace MS.RestApi.SourceGenerator.Utils
 {
     internal class ApiGenSourceCode
     {

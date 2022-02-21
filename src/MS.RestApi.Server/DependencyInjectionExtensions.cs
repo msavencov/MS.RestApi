@@ -10,16 +10,16 @@ namespace MS.RestApi.Server
         public static IMvcBuilder AddApiMvcOptions(this IMvcBuilder builder)
         {
             builder.AddMvcOptions(options =>
-                {
-                    options.Filters.Add<ExceptionHandlerFilterAttribute>();
-                })
-                .ConfigureApiBehaviorOptions(options =>
-                {
-                    options.InvalidModelStateResponseFactory = context =>
-                    {
-                        throw new InvalidModelStateException(context.ModelState);
-                    };
-                });
+                   {
+                       options.Filters.Add<ExceptionHandlerFilterAttribute>();
+                   })
+                   .ConfigureApiBehaviorOptions(options =>
+                   {
+                       options.InvalidModelStateResponseFactory = context =>
+                       {
+                           throw new InvalidModelStateException(context.ModelState);
+                       };
+                   });
             
             return builder;
         }
