@@ -1,15 +1,15 @@
 # MS.RestApi
 
-NuGet feeds
-- nuget https://www.nuget.org/packages/MS.RestApi/ - TBD
-- appveyor https://ci.appveyor.com/nuget/ms-restapi-r9yfjma0f07n
-
 MS.RestApi is a set of source generators that allow to generate client/server code based on shared contract assembly.
 
 The primary concept of this generator is to have defined a shared library that defines API in code which is referenced by Client and Server. 
 
 ## CI Status
 [![Build status](https://ci.appveyor.com/api/projects/status/yx56lwlibg15bjwv/branch/master?svg=true)](https://ci.appveyor.com/project/msavencov/ms-restapi/branch/master)
+
+## NuGet feeds
+- nuget https://www.nuget.org - TBD
+- appveyor https://ci.appveyor.com/nuget/ms-restapi
 
 ## Quick Start
 
