@@ -29,7 +29,7 @@ namespace MS.RestApi.SourceGenerator.Client
 
                 var clientApiName = ApiGenRequest.BuildClientName(service.ServiceName);
                 var clientInterfaceName = ApiGenRequest.BuildInterfaceName(service.ServiceName);
-                var clientInterfaceFullName = $"{config.ClientRootNamespace}.{clientInterfaceName}";
+                var clientInterfaceFullName = $"{config.ClientServicesNamespace}.{clientInterfaceName}";
                 var cancellationTokenType = symbol.CancellationToken.FullName();
                 
                 writer.WriteLine($"namespace {config.ClientServicesImplNamespace}");

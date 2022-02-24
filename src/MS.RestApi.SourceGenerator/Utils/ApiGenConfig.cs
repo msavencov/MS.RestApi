@@ -34,18 +34,17 @@ namespace MS.RestApi.SourceGenerator.Utils
                 UseMediatorHandlers = context.GetApiGenBuildProperty("UseMediatorHandlers").Parse<bool>(),
                 GenerateClient = context.GetApiGenBuildProperty("GenerateClient").Parse<bool>(),
                 AssemblyToScan = context.GetApiGenBuildProperty("AssemblyToScan").Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries).Parse<string>(),
-                ApiName = context.GetApiGenBuildProperty("ApiName") ?? "Generated",
-                RootNamespace = context.GetBuildProperty("RootNamespace"),
+                ApiName = context.GetApiGenBuildProperty("ApiName") ?? "GeneratedApi",
+                RootNamespace = context.GetApiGenBuildProperty("RootNamespace") ?? context.GetBuildProperty("RootNamespace"),
                 ApiBaseRoute = context.GetApiGenBuildProperty("ApiBaseRoute") ?? "api",
             };
-            config.RootNamespace += $".{config.ApiName}";
             
-            config.ClientRootNamespace = $"{config.RootNamespace}.Client";
+            config.ClientRootNamespace = $"{config.RootNamespace}.{config.ApiName}";
             config.ClientServicesNamespace = $"{config.ClientRootNamespace}.Services";
-            config.ClientServicesImplNamespace = $"{config.ClientRootNamespace}.ServicesImpl";
+            config.ClientServicesImplNamespace = $"{config.ClientRootNamespace}.Client";
             config.ClientExtensionsNamespace = $"{config.ClientRootNamespace}.Extensions";
             
-            config.ServerRootNamespace = $"{config.RootNamespace}.Server";
+            config.ServerRootNamespace = $"{config.RootNamespace}.{config.ApiName}";
             config.ServerControllerNamespace = $"{config.ServerRootNamespace}.Controllers";
             config.ServerServiceNamespace = $"{config.ServerRootNamespace}.Services";
             config.ServerServiceImplNamespace = $"{config.ServerRootNamespace}.ServicesImpl";

@@ -33,7 +33,7 @@ namespace MS.RestApi.SourceGenerator.Client
                 nsw.WriteLine("public static class DependencyInjectionExtensions");
                 nsw.WriteBlock(cw =>
                 {
-                    cw.WriteLine($"public static {serviceCollectionName} Add{config.ApiName}Api(this {serviceCollectionName} services, {configureOptionsArgName} configureOptions = default)");
+                    cw.WriteLine($"public static {serviceCollectionName} Add{config.ApiName}(this {serviceCollectionName} services, {configureOptionsArgName} configureOptions = default)");
                     cw.WriteBlock(mw =>
                     {
                         mw.WriteLine($"configureOptions ??= _ => {{  }};");
@@ -42,7 +42,7 @@ namespace MS.RestApi.SourceGenerator.Client
                         
                         foreach (var service in services)
                         {
-                            var serviceName = $"{config.ClientRootNamespace}.{ApiGenRequest.BuildInterfaceName(service)}";
+                            var serviceName = $"{config.ClientServicesNamespace}.{ApiGenRequest.BuildInterfaceName(service)}";
                             var serviceImplName = $"{config.ClientServicesImplNamespace}.{ApiGenRequest.BuildClientName(service)}";
                             
                             mw.WriteLine($"services.Add(new {serviceDescriptorName}(typeof({serviceName}), typeof({serviceImplName}), options.ServiceLifetime));");

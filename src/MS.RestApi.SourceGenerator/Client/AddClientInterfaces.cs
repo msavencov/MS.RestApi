@@ -41,7 +41,7 @@ namespace MS.RestApi.SourceGenerator.Client
             
             context.SourceCode.Add(new ApiGenSourceCode
             {
-                Name = $"{config.ClientRootNamespace}.{interfaceName}.cs",
+                Name = $"{config.ClientServicesNamespace}.{interfaceName}.cs",
                 Source = builder.ToString()
             });
         }
@@ -68,7 +68,7 @@ namespace MS.RestApi.SourceGenerator.Client
             var config = context.Config;
             var symbol = context.KnownSymbols;
             
-            writer.WriteLine($"namespace {config.ClientRootNamespace}");
+            writer.WriteLine($"namespace {config.ClientServicesNamespace}");
             writer.WriteBlock(namespaceBuilder =>
             {
                 namespaceBuilder.WriteLine($"public interface {ApiGenRequest.BuildInterfaceName(group)} : {symbol.IApiService.FullName()}");

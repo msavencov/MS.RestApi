@@ -148,7 +148,7 @@ dotnet add client package MS.RestApi.SourceGenerator
 
 * Implement generated request handler interface 
 ```c#
-internal class DefaultRequestHandler : RequestHandlerBase, IGeneratedRequestHandler
+internal class DefaultRequestHandler : RequestHandlerBase, IGeneratedApiRequestHandler
 {
     public DefaultRequestHandler(HttpClient client) : base(client)
     {
@@ -161,7 +161,7 @@ internal class DefaultRequestHandler : RequestHandlerBase, IGeneratedRequestHand
 ```c#
 private static IServiceProvider BuildServiceProvider(IServiceCollection services = default)
 {
-    services.AddHttpClient<IGeneratedRequestHandler, DefaultRequestHandler>()
+    services.AddHttpClient<IGeneratedApiRequestHandler, DefaultRequestHandler>()
             .ConfigureHttpClient(client =>
             {
                 client.BaseAddress = new Uri("http://localhost:5269");
@@ -207,14 +207,15 @@ Then assign the value
 
 Below is the list of generator configuration properties.
 
-| Property                  | Type   | Default   | Description                                                                           |
-|---------------------------|--------|-----------|---------------------------------------------------------------------------------------|
-| ApiGenAssemblyToScan      | string |           | The comma delimited list of assembly names in witch generator should scan for request |
-| ApiGenGenerateControllers | bool   | False     | Generate controllers for all requests defined in `ApiGenAssemblyToScan` assemblies    |
-| ApiGenGenerateClient      | bool   | False     | Generate client interfaces and their implementations                                  |
-| ApiGenApiName             | string | Generated | The namespace prefix for all generated types                                          |
-| ApiGenApiBaseRoute        | string | api       | The base route for generated endpoints                                                |
-| ApiGenUseMediatorHandlers | bool   | False     | By setting property to true controllers will use IMediator for dispatching requests   | 
+| Property                  | Type   | Default               | Description                                                                           |
+|---------------------------|--------|-----------------------|---------------------------------------------------------------------------------------|
+| ApiGenAssemblyToScan      | string |                       | The comma delimited list of assembly names in witch generator should scan for request |
+| ApiGenGenerateControllers | bool   | False                 | Generate controllers for all requests defined in `ApiGenAssemblyToScan` assemblies    |
+| ApiGenGenerateClient      | bool   | False                 | Generate client interfaces and their implementations                                  |
+| ApiGenApiName             | string | GeneratedApi          | The namespace prefix for all generated types                                          |
+| ApiGenRootNamespace       | string | &lt;RootNamespace&gt; | The root namespace of generated code                                                  |
+| ApiGenApiBaseRoute        | string | api                   | The base route for generated endpoints                                                |
+| ApiGenUseMediatorHandlers | bool   | False                 | By setting property to true controllers will use IMediator for dispatching requests   | 
 
 Assume that the root namespaces of assembly is referencing source generator is `My.Company.Api`
 
