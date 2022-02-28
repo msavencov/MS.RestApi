@@ -50,7 +50,7 @@ namespace MS.RestApi.Server.Filters
                 {
                     Code = 2,
                     CodeName = "Validation",
-                    MessageFormat = $"Validation errors occurred. See the 'ValidationErrors' property for details.",
+                    ErrorMessage = $"Validation errors occurred. See the 'ValidationErrors' property for details.",
                     ValidationErrors = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray()),
                     LogMessage = BuildValidationErrorMessage(state),
                 };
@@ -62,13 +62,15 @@ namespace MS.RestApi.Server.Filters
                 {
                     Code = 1,
                     CodeName = "Unhandled",
-                    MessageFormat = $"An unhandled error occured. {exception.Message}",
+                    ErrorMessage = $"An unhandled error occured: {exception.Message}",
                     LogMessage = exception.ToString(),
                 };
             }
 
-            context.Result = new ObjectResult(error);
-            context.HttpContext.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+            context.Result = new ObjectResult(error)
+            {
+                StatusCode = (int) HttpStatusCode.InternalServerError,
+            };
             context.ExceptionHandled = true;
         }
 

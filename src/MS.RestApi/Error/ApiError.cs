@@ -6,8 +6,7 @@ namespace MS.RestApi.Error
     {
         public int Code { get; init; }
         public string CodeName { get; init; }
-        public string MessageFormat { get; init; }
-        public string[] MessageFormatArgs { get; init; } = Array.Empty<string>();
+        public string ErrorMessage { get; init; }
         public string LogMessage { get; init; }
     }
 }

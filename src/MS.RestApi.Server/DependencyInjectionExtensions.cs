@@ -8,38 +8,21 @@ namespace MS.RestApi.Server
 {
     public static class DependencyInjectionExtensions
     {
-        public static IMvcBuilder AddApiMvcOptions(this IMvcBuilder builder)
+        public static IServiceCollection AddApiMvcOptions(this IServiceCollection services)
         {
-            builder.AddMvcOptions(options =>
-                   {
-                       options.Filters.Add<ExceptionHandlerFilterAttribute>();
-                   })
-                   .ConfigureApiBehaviorOptions(options =>
-                   {
-                       options.InvalidModelStateResponseFactory = context =>
-                       {
-                           throw new InvalidModelStateException(context.ModelState);
-                       };
-                   });
-            
-            return builder;
-        }
-        
-        public static IMvcCoreBuilder AddApiMvcOptions(this IMvcCoreBuilder builder)
-        {
-            builder.AddMvcOptions(options =>
-                   {
-                       options.Filters.Add<ExceptionHandlerFilterAttribute>();
-                   })
-                   .ConfigureApiBehaviorOptions(options =>
-                   {
-                       options.InvalidModelStateResponseFactory = context =>
-                       {
-                           throw new InvalidModelStateException(context.ModelState);
-                       };
-                   });
-            
-            return builder;
-        }
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add<ExceptionHandlerFilterAttribute>();
+            });
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    throw new InvalidModelStateException(context.ModelState);
+                };
+            });
+
+            return services;
+        } 
     }
 }

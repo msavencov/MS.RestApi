@@ -28,10 +28,12 @@ namespace MS.RestApi.SourceGenerator.Server
             var symbols = context.KnownSymbols;
 
             var controllerName = $"{service.ServiceName}Controller"; 
+            var apiControllerAttributeName = symbols.ApiControllerAttribute.FullName();
             
             writer.WriteLine($"namespace {context.Config.ServerControllerNamespace}");
             writer.WriteBlock(nsw =>
             {
+                nsw.WriteLine($"[{apiControllerAttributeName}]");
                 nsw.WriteLine($"public class {controllerName} : {symbols.ControllerBase.FullName()}");
                 nsw.WriteBlock(cw =>
                 {

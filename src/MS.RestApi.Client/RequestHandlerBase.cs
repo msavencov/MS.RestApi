@@ -77,7 +77,7 @@ namespace MS.RestApi.Client
             {
                 await OnRequestExceptionAsync(response, exception);
                 
-                throw new ApiRemoteErrorException
+                throw new ApiRemoteErrorException("An unhandled error occured while executing remote request.")
                 {
                     Error = await BuildApiError(response),
                 }; 
@@ -103,7 +103,7 @@ namespace MS.RestApi.Client
                     {
                         Code = -2,
                         CodeName = "MalformedResponseError",
-                        MessageFormat = "Failed to parse API error response.",
+                        ErrorMessage = "Failed to parse API error response.",
                         LogMessage = $"The response body seems to be not a valid JSON format: {responseBody}",
                     };
                 }
@@ -122,7 +122,7 @@ namespace MS.RestApi.Client
                 {
                     Code = -3,
                     CodeName = "UnknownResponseError",
-                    MessageFormat = "Failed to parse API error response.",
+                    ErrorMessage = "Failed to parse API error response.",
                     LogMessage = $"The response body seems to be not a valid JSON format: {responseBody}",
                 };
             }
@@ -131,7 +131,7 @@ namespace MS.RestApi.Client
             {
                 Code = -1,
                 CodeName = "UnknownStatusCode",
-                MessageFormat = $"Unknown response code: {(int)response.StatusCode} {response.StatusCode}.",
+                ErrorMessage = $"Unknown response code: {(int)response.StatusCode} {response.StatusCode}.",
                 LogMessage = $"Bad response received from the API server: {responseBody}",
             };
         }
