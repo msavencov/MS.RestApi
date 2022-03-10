@@ -7,7 +7,7 @@ namespace contract.Account
     /// <summary>
     /// Signin user and generate access token 
     /// </summary>
-    [EndPoint(Method.Post, "account/sign-in/local", "Account")]
+    [EndPoint(Method.Get, "account/sign-in/local", "Account")]
     public class SignInLocal : Request<SignInResponse>, IRequest<SignInResponse>
     {
         /// <summary>

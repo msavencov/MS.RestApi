@@ -1,11 +1,16 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using MS.RestApi.Server;
+using MS.RestApi.Server.Extensions;
+using MS.RestApi.Server.Swagger;
 
 namespace server
 {
@@ -13,15 +18,25 @@ namespace server
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                    .AddApiMvcOptions();
+            services.AddControllers();
+            services.AddApiMvcOptions();
             
-            services.AddEndpointsApiExplorer();
+            services.AddMediatR(typeof(Startup));
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "My API", Version = "v1"});
-                c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "server.xml"));
-                c.IncludeXmlComments(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "contract.xml"));
+
+                var docs = new[]
+                {
+                    typeof(contract.Module).Assembly.GetDocumentationFilePath(),
+                    typeof(server.Startup).Assembly.GetDocumentationFilePath(),
+                }.Select(XDocument.Load).ToArray();
+                
+                foreach (var doc in docs.ReplaceInheritedComments())
+                {
+                    c.IncludeXmlComments(() => new XPathDocument(doc.CreateReader()));
+                }
             });
         }
 

@@ -20,8 +20,12 @@ namespace client
             var accountApi = services.GetRequiredService<IAccountApi>();
             try
             {
-                var result1 = await accountApi.SignInLocalAsync(new SignInLocal(), CancellationToken.None);
-                await accountApi.SignOutAsync(new SignOut());
+                var model = new SignInLocal
+                {
+                    Password = "dasdasd",
+                    Username = "ad@ad@ad",
+                };
+                var result = await accountApi.SignInLocalAsync(model, CancellationToken.None);
             }
             catch (ApiRemoteErrorException)
             {
