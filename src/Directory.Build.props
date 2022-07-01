@@ -4,7 +4,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionPrefix>0.1.0.1</VersionPrefix>
     <Authors>Maxim Savencov</Authors>
     <Company>Maxim Savencov</Company>
     <Copyright>Copyright (c) Maxim Savencov 2021 - 2022</Copyright>
