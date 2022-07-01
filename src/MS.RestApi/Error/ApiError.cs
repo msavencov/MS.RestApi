@@ -2,11 +2,20 @@
 
 namespace MS.RestApi.Error
 {
-    public class ApiError
+    public class UnhandledApiError : ApiError
     {
-        public int Code { get; init; }
-        public string CodeName { get; init; }
-        public string ErrorMessage { get; init; }
-        public string LogMessage { get; init; }
+        public override string Code { get; } = "Generic";
+    }
+    
+    public abstract class ApiError
+    {
+        public abstract string Code { get; }
+        public string Reason { get; set; }
+        public string LogMessage { get; set; }
+    }
+
+    public abstract class ApiError<TDetail> : ApiError where TDetail : new()
+    {
+        public TDetail Detail { get; set; } = new TDetail();
     }
 }

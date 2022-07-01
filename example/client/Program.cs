@@ -18,6 +18,7 @@ namespace client
         {
             var services = BuildServiceProvider();
             var accountApi = services.GetRequiredService<IAccountApi>();
+
             try
             {
                 var model = new SignInLocal
@@ -27,9 +28,17 @@ namespace client
                 };
                 var result = await accountApi.SignInLocalAsync(model, CancellationToken.None);
             }
-            catch (ApiRemoteErrorException)
+            catch (ApiRemoteErrorException apiException)
             {
                 // handle API error
+            }
+            catch (ApiClientException clientException)
+            {
+                // 
+            }
+            catch (Exception exception)
+            {
+                //
             }
         }
 

@@ -1,5 +1,3 @@
-using System;
-using MS.RestApi.SourceGenerator.Builder;
 using MS.RestApi.SourceGenerator.Utils;
 
 namespace MS.RestApi.SourceGenerator.Server.Helpers

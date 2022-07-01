@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Builder;
@@ -20,7 +19,6 @@ namespace MS.RestApi.SourceGenerator.Client
             var symbolComparer = SymbolEqualityComparer.Default;
             var requestHandlerInterface = ApiGenSymbols.GetClientRequestHandlerInterface(symbol, config);
             var requestHandlerInterfaceName = $"{requestHandlerInterface.ContainingNamespace}.{requestHandlerInterface.InterfaceName}";
-            var methodName = symbol.Method.FullName();
             
             foreach (var service in services)
             {
@@ -55,6 +53,7 @@ namespace MS.RestApi.SourceGenerator.Client
                             cw.WriteLine($"public {responseType} {action.GetMethodName()}({requestType} model, {cancellationTokenType} ct = default)");
                             cw.WriteBlock(mw =>
                             {
+                                var resource = action.GetEndpointRoute(config).Quote();
                                 var handlerTypeArgs = action.Request.FullName();
 
                                 if (symbolComparer.Equals(action.Response, symbol.Task) == false)
@@ -62,10 +61,7 @@ namespace MS.RestApi.SourceGenerator.Client
                                     handlerTypeArgs += $", {action.Response.FullName()}";
                                 }
 
-                                var argMethod = $"{methodName}.{action.EndPoint.Method}";
-                                var argResource = action.GetEndpointRoute(config).Quote();
-
-                                mw.WriteLine($"return _httpRequestHandler.HandleAsync<{handlerTypeArgs}>({argMethod}, {argResource}, model, ct);");
+                                mw.WriteLine($"return _httpRequestHandler.HandleAsync<{handlerTypeArgs}>({resource}, model, ct);");
                             });
                         }
                     });

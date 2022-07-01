@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Abstractions;
 
 namespace MS.RestApi.SourceGenerator.Utils
 {
@@ -38,7 +37,6 @@ namespace MS.RestApi.SourceGenerator.Utils
     
     internal class ApiEndPoint
     {
-        public Method Method { get; set; }
         public string Service { get; set; }
         public string Path { get; set; }
     }

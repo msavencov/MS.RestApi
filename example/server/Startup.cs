@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -20,7 +18,6 @@ namespace server
         {
             services.AddControllers();
             services.AddApiMvcOptions();
-            
             services.AddMediatR(typeof(Startup));
             
             services.AddSwaggerGen(c =>

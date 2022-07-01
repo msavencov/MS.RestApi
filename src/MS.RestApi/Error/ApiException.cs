@@ -12,12 +12,6 @@ namespace MS.RestApi.Error
         {
         }
 
-        public ApiError Error { get; init; }
-
-        public override string ToString()
-        {
-            var nl = Environment.NewLine;
-            return $"[{Error.CodeName}: {Error.Code}] {Error.ErrorMessage}{nl}{Error.LogMessage}{nl}{base.ToString()}";
-        }
+        public ApiError Error { get; protected set; }
     }
 }

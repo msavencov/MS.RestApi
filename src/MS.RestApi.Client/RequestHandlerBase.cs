@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Net;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using MS.RestApi.Abstractions;
 using MS.RestApi.Client.Exceptions;
 using MS.RestApi.Error;
-using MS.RestApi.Error.BadRequest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -21,14 +19,14 @@ namespace MS.RestApi.Client
             Client = client;
         }
         
-        public async Task HandleAsync<TModel>(Method method, string resource, TModel model, CancellationToken ct)
+        public async Task HandleAsync<TModel>(string resource, TModel model, CancellationToken ct)
         {
-            await ExecuteAsync(method, resource, model, ct);
+            await ExecuteAsync(resource, model, ct);
         }
 
-        public async Task<TResult> HandleAsync<TModel, TResult>(Method method, string resource, TModel model, CancellationToken ct)
+        public async Task<TResult> HandleAsync<TModel, TResult>(string resource, TModel model, CancellationToken ct)
         {
-            var response = await ExecuteAsync(method, resource, model, ct);
+            var response = await ExecuteAsync(resource, model, ct);
             var responseBody = await response.Content.ReadAsStringAsync();
 
             if (typeof(TResult) == typeof(string))
@@ -47,18 +45,10 @@ namespace MS.RestApi.Client
             }
         }
 
-        private async Task<HttpResponseMessage> ExecuteAsync(Method method, string resource, object model, CancellationToken ct)
+        private async Task<HttpResponseMessage> ExecuteAsync(string resource, object model, CancellationToken ct)
         {
-            var httpMethod = method switch
-            {
-                Method.Delete => HttpMethod.Delete,
-                Method.Get => HttpMethod.Get,
-                Method.Post => HttpMethod.Post,
-                _ => throw new ArgumentOutOfRangeException(nameof(method), method, null)
-            };
-
             var body = JsonConvert.SerializeObject(model); 
-            var message = new HttpRequestMessage(httpMethod, resource)
+            var message = new HttpRequestMessage(HttpMethod.Post, resource)
             {
                 Content = new JsonContent(body),
             };
@@ -71,71 +61,45 @@ namespace MS.RestApi.Client
 
             try
             {
-                response.EnsureSuccessStatusCode();
+                return response.EnsureSuccessStatusCode();
             }
             catch (Exception exception)
             {
                 await OnRequestExceptionAsync(response, exception);
-                
-                throw new ApiRemoteErrorException("An unhandled error occured while executing remote request.")
-                {
-                    Error = await BuildApiError(response),
-                }; 
             }
-            
-            return response;
-        }
 
-        private async Task<ApiError> BuildApiError(HttpResponseMessage response)
-        {
             var responseBody = await response.Content.ReadAsStringAsync();
-            var responseObj = (JObject)null;
+            var error = default(ApiError);
+            var errorType = typeof(ApiError);
+            var responseObj = JObject.Parse(responseBody);
             
-            if (response.StatusCode == HttpStatusCode.InternalServerError)
+            if (responseObj.TryGetValue("Code", out var cp) == false)
             {
-                try
-                {
-                    responseObj = JObject.Parse(responseBody);
-                }
-                catch (JsonReaderException)
-                {
-                    return new ApiError
-                    {
-                        Code = -2,
-                        CodeName = "MalformedResponseError",
-                        ErrorMessage = "Failed to parse API error response.",
-                        LogMessage = $"The response body seems to be not a valid JSON format: {responseBody}",
-                    };
-                }
-
-                if (responseObj.ContainsKey("code"))
-                {
-                    if (responseObj.Value<int>("code") == 2)
-                    {
-                        return responseObj.ToObject<ValidationApiError>();
-                    }
-                    
-                    return responseObj.ToObject<ApiError>();
-                }
-                
-                return new ApiError
-                {
-                    Code = -3,
-                    CodeName = "UnknownResponseError",
-                    ErrorMessage = "Failed to parse API error response.",
-                    LogMessage = $"The response body seems to be not a valid JSON format: {responseBody}",
-                };
+                throw new ApiClientException("Failed to parse API error response.", response);
             }
 
-            return new ApiError
+            if (response.Headers.TryGetValues("X-Error-Type", out var errorTypeHeaders))
             {
-                Code = -1,
-                CodeName = "UnknownStatusCode",
-                ErrorMessage = $"Unknown response code: {(int)response.StatusCode} {response.StatusCode}.",
-                LogMessage = $"Bad response received from the API server: {responseBody}",
-            };
+                var errorTypeString = errorTypeHeaders.FirstOrDefault();
+                
+                if (errorTypeString is {Length: > 0})
+                {
+                    errorType = Type.GetType(errorTypeString!, false) ?? errorType;
+                }
+            }
+            
+            try
+            {
+                error = (ApiError) responseObj.ToObject(errorType);
+            }
+            catch (Exception e)
+            {
+                throw new ApiClientException("Failed to parse API error response.", response, e);
+            }
+
+            throw new ApiRemoteErrorException("An unhandled error occured while executing remote request.", error);
         }
-        
+
         protected virtual Task OnRequestMessageSentAsync(HttpResponseMessage response)
         {
             return Task.CompletedTask;

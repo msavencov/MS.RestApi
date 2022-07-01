@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MS.RestApi.Server.Exceptions;
 using MS.RestApi.Server.Filters;
-using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace MS.RestApi.Server
 {
@@ -21,8 +21,8 @@ namespace MS.RestApi.Server
                     throw new InvalidModelStateException(context.ModelState);
                 };
             });
-
+            
             return services;
-        } 
+        }
     }
 }

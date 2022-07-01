@@ -13,4 +13,8 @@
       <ProjectReference Include="..\MS.RestApi\MS.RestApi.csproj" />
     </ItemGroup>
     
+    <ItemGroup>
+      <Compile Include="..\Common\Errors\**\*.cs" LinkBase="Errors" />
+    </ItemGroup>
+    
 </Project>

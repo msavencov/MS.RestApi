@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using MS.RestApi.SourceGenerator.Builder;
 using MS.RestApi.SourceGenerator.Common;
@@ -80,9 +79,9 @@ namespace MS.RestApi.SourceGenerator.Client
                         var name = request.GetMethodName();
                         var model = request.Request.FullName();
                         var ct = symbol.CancellationToken.FullName();
-                        var method = $"{returnResult} {name}({model} model, {ct} ct = default);";
-
-                        interfaceBuilder.WriteLine(method);
+                        
+                        interfaceBuilder.WriteLine($"/// <inheritdoc cref=\"{model}\"/>");
+                        interfaceBuilder.WriteLine($"{returnResult} {name}({model} model, {ct} ct = default);");
                     }
                 });
             });

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Abstractions;
 using MS.RestApi.SourceGenerator.Utils;
 
 namespace MS.RestApi.SourceGenerator.Extensions
@@ -10,12 +9,12 @@ namespace MS.RestApi.SourceGenerator.Extensions
     {
         public static ApiEndPoint ToApiEndPoint(this AttributeData attributeData)
         {
-            var endPoint = new ApiEndPoint();
+            var endPoint = new ApiEndPoint
+            {
+                Path = (string)attributeData.ConstructorArguments[0].GetConstantValue(),
+                Service = (string)attributeData.ConstructorArguments[1].GetConstantValue()
+            };
 
-            endPoint.Method = (Method)attributeData.ConstructorArguments[0].GetConstantValue();
-            endPoint.Path = (string)attributeData.ConstructorArguments[1].GetConstantValue();
-            endPoint.Service = (string)attributeData.ConstructorArguments[2].GetConstantValue();
-            
             return endPoint;
         }
         /*

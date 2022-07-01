@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
-using MS.RestApi.Abstractions;
 using MS.RestApi.SourceGenerator.Common;
 using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Utils;
@@ -18,20 +17,11 @@ namespace MS.RestApi.SourceGenerator.Server.Helpers
             {
                 yield return new ControllerAction(action)
                 {
-                    HttpMethodAttribute = (action.EndPoint.Method switch
-                    {
-                        Method.Delete => symbols.HttpDeleteAttribute,
-                        Method.Post => symbols.HttpPostAttribute,
-                        _ => symbols.HttpGetAttribute,
-                    }).FullName(),
+                    HttpMethodAttribute = symbols.HttpPostAttribute.FullName(),
                     HttpRouteAttribute = $"{symbols.RouteAttribute.FullName()}(\"{action.GetEndpointRoute(config)}\")",
                     ResponseTypeName = action.GetResponseTypeName(context),
                     ActionName = action.Request.Name,
-                    ModelFromAttributeName = (action.EndPoint.Method switch
-                    {
-                        Method.Post => symbols.FromBodyAttribute,
-                        _ => symbols.FromQueryAttribute,
-                    }).FullName(),
+                    ModelFromAttributeName = symbols.FromBodyAttribute.FullName(),
                     ModelTypeName = action.Request.FullName(),
                     ResponseTypeIsVoid = SymbolEqualityComparer.Default.Equals(action.Response, symbols.Task)
                 };

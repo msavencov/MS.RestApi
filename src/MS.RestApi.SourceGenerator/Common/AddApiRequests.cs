@@ -36,7 +36,7 @@ namespace MS.RestApi.SourceGenerator.Common
                     EndPoint = apiEndPoint,
                 };
 
-                var baseTypes = requestTypeSymbol.Traverse(t => t.BaseType);
+                var baseTypes = requestTypeSymbol.SelectRecursive(t => t.BaseType);
 
                 foreach (var baseType in baseTypes)
                 {

@@ -7,13 +7,13 @@ namespace contract.Account
     /// <summary>
     /// Signin user and generate access token 
     /// </summary>
-    [EndPoint(Method.Get, "account/sign-in/local", "Account")]
+    [EndPoint("account/sign-in/local", "Account")]
     public class SignInLocal : Request<SignInResponse>, IRequest<SignInResponse>
     {
         /// <summary>
         /// The user's account email 
         /// </summary>
-        [Required, EmailAddress]
+        [Required, EmailAddress, MaxLength(320)]
         public string Username { get; set; }
         
         /// <summary>

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using MS.RestApi.SourceGenerator.Builder;
 using MS.RestApi.SourceGenerator.Common;

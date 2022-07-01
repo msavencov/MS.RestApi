@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -7,20 +8,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MS.RestApi.Error;
-using MS.RestApi.Error.BadRequest;
+using MS.RestApi.Errors;
 using MS.RestApi.Server.Exceptions;
 
 namespace MS.RestApi.Server.Filters
 {
     public class ExceptionHandlerFilterAttribute : ExceptionFilterAttribute
     {
+        private readonly IEnumerable<IExceptionHandler> _handlers;
+
+        public ExceptionHandlerFilterAttribute(IEnumerable<IExceptionHandler> handlers)
+        {
+            _handlers = handlers;
+        }
+        
         public override void OnException(ExceptionContext context)
         {
-            if (context.ExceptionHandled)
+            if (context.ExceptionHandled || context.Exception == null)
             {
                 return;
             }
-
+            
             var error = default(ApiError);
             var exception = context.Exception;
 
@@ -34,39 +42,45 @@ namespace MS.RestApi.Server.Filters
                 exception = ae.InnerException;
             }
 
-            if (exception == null)
-            {
-                return;
-            }
+            exception ??= context.Exception;
 
             if (exception is ApiException apiException)
             {
                 error = apiException.Error;
             }
-
+            
             if (exception is InvalidModelStateException {ModelState: {ErrorCount: > 0} state})
             {
                 error = new ValidationApiError
                 {
-                    Code = 2,
-                    CodeName = "Validation",
-                    ErrorMessage = $"Validation errors occurred. See the 'ValidationErrors' property for details.",
-                    ValidationErrors = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray()),
+                    Reason = $"Validation errors occurred. See the '{nameof(ValidationApiError.Detail)}' for details.",
+                    Detail = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray()),
                     LogMessage = BuildValidationErrorMessage(state),
                 };
             }
 
-            if (error is null)
+            if (error == null)
             {
-                error = new ApiError()
+                foreach (var handler in _handlers)
                 {
-                    Code = 1,
-                    CodeName = "Unhandled",
-                    ErrorMessage = $"An unhandled error occured: {exception.Message}",
-                    LogMessage = exception.ToString(),
-                };
+                    if (handler.Handle(exception, out error))
+                    {
+                        break;
+                    }
+                }
             }
+            
+            error ??= new UnhandledApiError
+            {
+                Reason = $"An unhandled error occured: {exception.Message}",
+                LogMessage = exception.ToString(),
+            };
 
+            if (context.HttpContext.Response is {HasStarted: false} response)
+            {
+                response.Headers.Add("X-Error-Type", error.GetType().FullName);
+            }
+            
             context.Result = new ObjectResult(error)
             {
                 StatusCode = (int) HttpStatusCode.InternalServerError,
