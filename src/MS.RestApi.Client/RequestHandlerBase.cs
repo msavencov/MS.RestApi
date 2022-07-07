@@ -73,7 +73,7 @@ namespace MS.RestApi.Client
             var errorType = typeof(ApiError);
             var responseObj = JObject.Parse(responseBody);
             
-            if (responseObj.TryGetValue("Code", out var cp) == false)
+            if (responseObj.TryGetValue("code", out var cp) == false)
             {
                 throw new ApiClientException("Failed to parse API error response.", response);
             }
