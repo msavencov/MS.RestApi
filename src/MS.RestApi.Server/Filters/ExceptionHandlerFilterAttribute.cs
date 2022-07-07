@@ -78,7 +78,7 @@ namespace MS.RestApi.Server.Filters
 
             if (context.HttpContext.Response is {HasStarted: false} response)
             {
-                response.Headers.Add("X-Error-Type", error.GetType().FullName);
+                response.Headers.Add("X-Error-Type", $"{error.GetType().FullName}, {error.GetType().Assembly.GetName().Name}");
             }
             
             context.Result = new ObjectResult(error)
