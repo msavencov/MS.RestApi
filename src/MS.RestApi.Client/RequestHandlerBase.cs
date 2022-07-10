@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MS.RestApi.Client.Exceptions;
 using MS.RestApi.Error;
+using MS.RestApi.Errors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -70,14 +71,14 @@ namespace MS.RestApi.Client
 
             var responseBody = await response.Content.ReadAsStringAsync();
             var error = default(ApiError);
-            var errorType = typeof(ApiError);
+            var errorType = typeof(GenericApiError);
             var responseObj = JObject.Parse(responseBody);
-            
-            if (responseObj.TryGetValue("code", out var cp) == false)
-            {
-                throw new ApiClientException("Failed to parse API error response.", response);
-            }
 
+            if (responseObj.Property(nameof(ApiError.Code)) == null)
+            {
+                throw new ApiClientException($"Failed to parse API error response: {responseBody.Substring(0, 100)}", response);
+            }
+            
             if (response.Headers.TryGetValues("X-Error-Type", out var errorTypeHeaders))
             {
                 var errorTypeString = errorTypeHeaders.FirstOrDefault();
@@ -87,7 +88,7 @@ namespace MS.RestApi.Client
                     errorType = Type.GetType(errorTypeString!, false) ?? errorType;
                 }
             }
-            
+
             try
             {
                 error = (ApiError) responseObj.ToObject(errorType);

@@ -2,11 +2,6 @@
 
 namespace MS.RestApi.Error
 {
-    public class UnhandledApiError : ApiError
-    {
-        public override string Code { get; } = "Generic";
-    }
-    
     public abstract class ApiError
     {
         public abstract string Code { get; }

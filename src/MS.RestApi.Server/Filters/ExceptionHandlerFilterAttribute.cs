@@ -70,7 +70,7 @@ namespace MS.RestApi.Server.Filters
                 }
             }
             
-            error ??= new UnhandledApiError
+            error ??= new GenericApiError
             {
                 Reason = $"An unhandled error occured: {exception.Message}",
                 LogMessage = exception.ToString(),
