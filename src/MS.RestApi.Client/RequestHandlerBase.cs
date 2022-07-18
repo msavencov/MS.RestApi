@@ -74,7 +74,7 @@ namespace MS.RestApi.Client
             var errorType = typeof(GenericApiError);
             var responseObj = JObject.Parse(responseBody);
 
-            if (responseObj.Property(nameof(ApiError.Code)) == null)
+            if (responseObj.Property(nameof(ApiError.Code), System.StringComparison.OrdinalIgnoreCase) == null)
             {
                 throw new ApiClientException($"Failed to parse API error response: {responseBody.Substring(0, 100)}", response);
             }
