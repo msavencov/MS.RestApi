@@ -51,7 +51,7 @@ namespace client
             services.AddHttpClient<IGeneratedApiRequestHandler, DefaultRequestHandler>()
                     .ConfigureHttpClient(client =>
                     {
-                        client.BaseAddress = new Uri("http://localhost:5269");
+                        client.BaseAddress = new Uri("http://localhost:5269/api");
                     });
             services.AddGeneratedApi(options =>
             {

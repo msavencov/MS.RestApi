@@ -53,7 +53,7 @@ namespace MS.RestApi.SourceGenerator.Client
                             cw.WriteLine($"public {responseType} {action.GetMethodName()}({requestType} model, {cancellationTokenType} ct = default)");
                             cw.WriteBlock(mw =>
                             {
-                                var resource = action.GetEndpointRoute(config).Quote();
+                                var resource = action.EndPoint.Path.Trim('/').Quote();
                                 var handlerTypeArgs = action.Request.FullName();
 
                                 if (symbolComparer.Equals(action.Response, symbol.Task) == false)

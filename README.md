@@ -36,7 +36,7 @@ using MS.RestApi.Abstractions;
 
 namespace contract
 {
-    [EndPoint(Method.Post, "account/signin/local", "Account")]
+    [EndPoint("account/signin/local", "Account")]
     public class Signin : Request<SigninResponse>
     {
         [Required, EmailAddress]
@@ -70,24 +70,14 @@ dotnet add server package MS.RestApi.SourceGenerator
 dotnet add server reference contract
 ```
 
-* configure source generator in `server/server.csproj`
-```xml
-  <ItemGroup>
-    <CompilerVisibleProperty Include="ApiGenAssemblyToScan" /> 
-    <CompilerVisibleProperty Include="ApiGenGenerateControllers" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <ApiGenAssemblyToScan>contract</ApiGenAssemblyToScan>
-    <!-- tell to generator where to scan for operations -->
-    
-    <ApiGenGenerateControllers>true</ApiGenGenerateControllers> 
-    <!-- tell to generator that we want to generate controllers -->
-  </PropertyGroup>
+* Configure API Gen to generate controllers
+```csharp
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new []{"contract"})]
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateControllers", true)]
 ```
 
 * Register exception filter service in `ConfigureServices(IServiceCollection services)`
-```c#
+```csharp
 services.AddControllers(options =>
 {
     options.Filters.Add<ExceptionHandlerFilterAttribute>();
@@ -95,7 +85,7 @@ services.AddControllers(options =>
 ```
 
 * Implement generated service interface
-```c#
+```csharp
 internal class AccountService : IAccountService
 {
     public Task<SigninResponse> SigninAsync(Signin model, CancellationToken ct = default)
@@ -130,24 +120,14 @@ dotnet add client package MS.RestApi.Client
 dotnet add client package MS.RestApi.SourceGenerator
 ```
 
-* configure source generator in `client/client.csproj`
-```xml
-  <ItemGroup>
-    <CompilerVisibleProperty Include="ApiGenAssemblyToScan" /> 
-    <CompilerVisibleProperty Include="ApiGenGenerateClient" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <ApiGenAssemblyToScan>contract</ApiGenAssemblyToScan>
-    <!-- tell to generator where to scan for operations -->
-    
-    <ApiGenGenerateClient>true</ApiGenGenerateClient> 
-    <!-- tell to generator that we want to generate client implementation -->
-  </PropertyGroup>
+* Configure API Gen to generate client
+```csharp
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateClient", true)]
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new[] {"contract"})]
 ```
 
 * Implement generated request handler interface 
-```c#
+```csharp
 internal class DefaultRequestHandler : RequestHandlerBase, IGeneratedApiRequestHandler
 {
     public DefaultRequestHandler(HttpClient client) : base(client)
@@ -158,13 +138,13 @@ internal class DefaultRequestHandler : RequestHandlerBase, IGeneratedApiRequestH
 ```
 
 * Register api client dependencies and configure generated services 
-```c#
+```csharp
 private static IServiceProvider BuildServiceProvider(IServiceCollection services = default)
 {
     services.AddHttpClient<IGeneratedApiRequestHandler, DefaultRequestHandler>()
             .ConfigureHttpClient(client =>
             {
-                client.BaseAddress = new Uri("http://localhost:5269");
+                client.BaseAddress = new Uri("http://localhost:5000/api");
             });
     services.AddGeneratedApi(options =>
     {
@@ -176,7 +156,7 @@ private static IServiceProvider BuildServiceProvider(IServiceCollection services
 ```
 
 * Usage
-```c#
+```csharp
 var services = BuildServiceProvider();
 var accountApi = services.GetRequiredService<IAccountApi>();
 try
@@ -194,18 +174,18 @@ catch (ApiRemoteErrorException errorException)
 To use configure generator properties you should add the assembly attribute `ApiGenConfigAttribute`
 
 The Minimal configuration for server projects:
-```c#
+```csharp
 [assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateControllers", true)]
 [assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new []{"contract"})]
 ```
 
 The Minimal configuration for client projects:
-```c#
+```csharp
 [assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateClient", true)]
 [assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new[] {"contract"})]
 ```
 
-Below is the list of configurable generator configuration properties.
+Below is the list of configurable generator properties.
 
 | Property                        | Type     | Default          | Description                                                                           |
 |---------------------------------|----------|------------------|---------------------------------------------------------------------------------------|
