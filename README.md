@@ -191,32 +191,31 @@ catch (ApiRemoteErrorException errorException)
 
 ### Generator configuration options
 
-To use generator configuration properties you should define the property as visible for compiler.
-```xml
-  <ItemGroup>
-    <CompilerVisibleProperty Include="ApiGenAssemblyToScan" />
-  </ItemGroup>
+To use configure generator properties you should add the assembly attribute `ApiGenConfigAttribute`
+
+The Minimal configuration for server projects:
+```c#
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateControllers", true)]
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new []{"contract"})]
 ```
 
-Then assign the value 
-```xml
-  <PropertyGroup>
-    <ApiGenAssemblyToScan>My.Assembly</ApiGenAssemblyToScan>
-  </PropertyGroup>
+The Minimal configuration for client projects:
+```c#
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateClient", true)]
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new[] {"contract"})]
 ```
 
-Below is the list of generator configuration properties.
+Below is the list of configurable generator configuration properties.
 
-| Property                  | Type   | Default               | Description                                                                           |
-|---------------------------|--------|-----------------------|---------------------------------------------------------------------------------------|
-| ApiGenAssemblyToScan      | string |                       | The comma delimited list of assembly names in witch generator should scan for request |
-| ApiGenGenerateControllers | bool   | False                 | Generate controllers for all requests defined in `ApiGenAssemblyToScan` assemblies    |
-| ApiGenGenerateClient      | bool   | False                 | Generate client interfaces and their implementations                                  |
-| ApiGenApiName             | string | GeneratedApi          | The namespace prefix for all generated types                                          |
-| ApiGenRootNamespace       | string | &lt;RootNamespace&gt; | The root namespace of generated code                                                  |
-| ApiGenApiBaseRoute        | string | api                   | The base route for generated endpoints                                                |
-| ApiGenUseMediatorHandlers | bool   | False                 | By setting property to true controllers will use IMediator for dispatching requests   | 
-
-Assume that the root namespaces of assembly is referencing source generator is `My.Company.Api`
-
-The root namespace for all generated code consist of the root namespace of referencing assembly ends with `ApiGenApiName` property's value, witch results in `My.Company.Api.Generated`  
+| Property                        | Type     | Default          | Description                                                                           |
+|---------------------------------|----------|------------------|---------------------------------------------------------------------------------------|
+| AssemblyToScan                  | string[] |                  | The comma delimited list of assembly names in witch generator should scan for request |
+| GenerateControllers             | bool     | false            | Generate controllers for all requests defined in `AssemblyToScan` assemblies          |
+| GenerateClient                  | bool     | false            | Generate client interfaces and their implementations                                  |
+| ApiName                         | string   | GeneratedApi     | The namespace prefix for all generated types                                          |
+| RootNamespace                   | string   | $(RootNamespace) | The root namespace for all generated code                                             |
+| ApiBaseRoute                    | string   | api              | The base route for generated endpoints                                                |
+| UseMediatorHandlers<sup>1</sup> | bool     | false            | By setting property to true controllers will use IMediator for dispatching requests   | 
+ 
+Notice:
+1. The MediatR nuget package `<PackageReference Include="MediatR" Version="9.0.0" />` must be referenced.

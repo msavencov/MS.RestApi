@@ -6,7 +6,7 @@ namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class ReflectionExtensions
     {
-        public static string ReadResource(this Assembly assembly, string resourceNameEndsWith)
+        public static string ReadEmbeddedResource(this Assembly assembly, string resourceNameEndsWith)
         {
             var name = assembly.GetManifestResourceNames().Single(t => t.EndsWith(resourceNameEndsWith));
             var stream = assembly.GetManifestResourceStream(name);
