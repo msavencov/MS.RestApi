@@ -8,26 +8,6 @@ namespace MS.RestApi.SourceGenerator.Extensions
 {
     internal static class StringExtensions
     {
-        public static TValue[] Parse<TValue>(this string[] value)
-        {
-            return value.Select(t => t.Trim().Parse<TValue>()).ToArray();
-        }
-
-        public static TValue Parse<TValue>(this object value)
-        {
-            if (value == null)
-            {
-                return default;
-            }
-
-            if (value is TValue v)
-            {
-                return v;
-            }
-
-            return (TValue)TypeDescriptor.GetConverter(typeof(TValue)).ConvertFrom(value);
-        }
-
         public static TValue Parse<TValue>(this string value)
         {
             if (value == null)

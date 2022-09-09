@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new []{"contract"})]
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateControllers", true)]
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("UseMediatorHandlers", true)]
+
 namespace server
 {
     internal class Program

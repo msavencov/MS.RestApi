@@ -19,19 +19,9 @@ namespace MS.RestApi.SourceGenerator.Extensions
             return default;
         }
 
-        private static string GetApiGenBuildProperty(this AnalyzerConfigOptions options, string propertyName)
-        {
-            return options.GetBuildProperty($"ApiGen{propertyName}");
-        }
-
         public static string GetBuildProperty(this GeneratorExecutionContext context, string propertyName)
         {
             return context.AnalyzerConfigOptions.GlobalOptions.GetBuildProperty(propertyName);
-        }
-        
-        public static string GetApiGenBuildProperty(this GeneratorExecutionContext context, string propertyName)
-        {
-            return context.AnalyzerConfigOptions.GlobalOptions.GetApiGenBuildProperty(propertyName);
         }
 
         public static Exception ReportTypeNotFoundDiagnosticError(this GeneratorExecutionContext context, string typeName, Location location = null)

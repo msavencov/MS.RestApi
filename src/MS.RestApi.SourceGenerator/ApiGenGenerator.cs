@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Utils;
@@ -8,15 +10,12 @@ namespace MS.RestApi.SourceGenerator
     [Generator]
     internal class ApiGenGenerator : ISourceGenerator
     {
-        public void Initialize(GeneratorInitializationContext context)
+        static ApiGenGenerator()
         {
-            
+            //System.Diagnostics.Debugger.Launch();
         }
-
         public void Execute(GeneratorExecutionContext context)
         {
-            //System.Threading.SpinWait.SpinUntil(() => System.Diagnostics.Debugger.IsAttached);
-            
             try
             {
                 var apiGenContext = ApiGenContext.Create(context);
@@ -29,6 +28,17 @@ namespace MS.RestApi.SourceGenerator
                 context.ReportDiagnosticError(e);
                 throw;
             }
+        }
+
+        public void Initialize(GeneratorInitializationContext context)
+        {
+            context.RegisterForPostInitialization(initializationContext =>
+            {
+                var apiGenConfigAttribute = Assembly.GetExecutingAssembly().ReadEmbeddedResource("ApiGenConfigAttribute.tpl");
+                var apiGenConfigAttributeName = $"MS.RestApi.SourceGenerator.ApiGenConfigAttribute.cs";
+                
+                initializationContext.AddSource(apiGenConfigAttributeName, apiGenConfigAttribute);
+            });
         }
     }
 }
