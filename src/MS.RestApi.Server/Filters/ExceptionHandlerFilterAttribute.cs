@@ -49,16 +49,6 @@ namespace MS.RestApi.Server.Filters
                 error = apiException.Error;
             }
             
-            if (exception is InvalidModelStateException {ModelState: {ErrorCount: > 0} state})
-            {
-                error = new ValidationApiError
-                {
-                    Reason = $"Validation errors occurred. See the '{nameof(ValidationApiError.Detail)}' for details.",
-                    Detail = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray()),
-                    LogMessage = BuildValidationErrorMessage(state),
-                };
-            }
-
             if (error == null)
             {
                 foreach (var handler in _handlers)
@@ -70,6 +60,16 @@ namespace MS.RestApi.Server.Filters
                 }
             }
             
+            if (exception is InvalidModelStateException {ModelState: {ErrorCount: > 0} state})
+            {
+                error = new ValidationApiError
+                {
+                    Reason = $"Validation errors occurred. See the '{nameof(ValidationApiError.Detail)}' for details.",
+                    Detail = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray()),
+                    LogMessage = BuildValidationErrorMessage(state),
+                };
+            }
+
             error ??= new GenericApiError
             {
                 Reason = $"An unhandled error occured: {exception.Message}",

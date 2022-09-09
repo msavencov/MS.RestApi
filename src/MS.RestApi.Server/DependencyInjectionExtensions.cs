@@ -16,10 +16,7 @@ namespace MS.RestApi.Server
             });
             services.Configure<ApiBehaviorOptions>(options =>
             {
-                options.InvalidModelStateResponseFactory = context =>
-                {
-                    throw new InvalidModelStateException(context.ModelState);
-                };
+                options.InvalidModelStateResponseFactory = context => throw new InvalidModelStateException(context.ModelState);
             });
             
             return services;

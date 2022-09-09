@@ -85,7 +85,7 @@ namespace MS.RestApi.Client
                 
                 if (errorTypeString is {Length: > 0})
                 {
-                    errorType = Type.GetType(errorTypeString!, false) ?? errorType;
+                    errorType = Type.GetType(errorTypeString, false) ?? errorType;
                 }
             }
 
