@@ -47,8 +47,10 @@ namespace MS.RestApi.SourceGenerator.Server
                     });
                     cw.WriteLine();
                     
-                    foreach (var action in service.Operations.AsActions(context))
+                    foreach (var operation in service.Operations)
                     {
+                        var action = operation.AsAction(context);
+
                         cw.WriteLine($"/// <inheritdoc cref=\"{action.ModelTypeName}\"/>");
                         cw.WriteLine($"[{action.HttpMethodAttribute}, {action.HttpRouteAttribute}]");
                         cw.WriteLine($"public async {action.ResponseTypeName} {action.ActionName}([{action.ModelFromAttributeName}] {action.ModelTypeName} model, {symbols.CancellationToken.FullName()} ct)");

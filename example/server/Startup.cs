@@ -1,6 +1,5 @@
-using System.Linq;
-using System.Xml.Linq;
 using System.Xml.XPath;
+using contract;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,19 +19,19 @@ namespace server
             services.AddApiMvcOptions();
             services.AddMediatR(typeof(Startup));
             
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "My API", Version = "v1"});
+                options.SwaggerDoc("v1", new OpenApiInfo {Title = "My API", Version = "v1"});
 
                 var docs = new[]
                 {
-                    typeof(contract.Module).Assembly.GetDocumentationFilePath(),
-                    typeof(server.Startup).Assembly.GetDocumentationFilePath(),
-                }.Select(XDocument.Load).ToArray();
+                    typeof(Module).Assembly.GetDocumentation(),
+                    typeof(Startup).Assembly.GetDocumentation(),
+                };
                 
                 foreach (var doc in docs.ReplaceInheritedComments())
                 {
-                    c.IncludeXmlComments(() => new XPathDocument(doc.CreateReader()));
+                    options.IncludeXmlComments(() => new XPathDocument(doc.CreateReader()));
                 }
             });
         }

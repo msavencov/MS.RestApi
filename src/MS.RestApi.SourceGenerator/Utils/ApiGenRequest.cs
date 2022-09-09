@@ -28,7 +28,10 @@ namespace MS.RestApi.SourceGenerator.Utils
 
         public string GetEndpointRoute(ApiGenConfig config)
         {
-            return EndPoint.Path.Trim('/');
+            var prefix = config.ApiBaseRoute.Trim('/');
+            var route = EndPoint.Path.Trim('/');
+
+            return $"{prefix}/{route}";
         }
     }
     
