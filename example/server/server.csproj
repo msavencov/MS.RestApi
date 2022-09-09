@@ -12,18 +12,6 @@
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <CompilerVisibleProperty Include="ApiGenAssemblyToScan" />
-    <CompilerVisibleProperty Include="ApiGenGenerateControllers" />
-    <CompilerVisibleProperty Include="ApiGenUseMediatorHandlers" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <ApiGenGenerateControllers>true</ApiGenGenerateControllers>
-    <ApiGenAssemblyToScan>contract</ApiGenAssemblyToScan>
-    <ApiGenUseMediatorHandlers>true</ApiGenUseMediatorHandlers>
-  </PropertyGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\MS.RestApi\MS.RestApi.csproj" />

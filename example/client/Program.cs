@@ -10,6 +10,9 @@ using contract.Account;
 using MS.RestApi.Client;
 using MS.RestApi.Client.Exceptions;
 
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateClient", true)]
+[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new[] {"contract"})]
+
 namespace client
 {
     class Program

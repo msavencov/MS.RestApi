@@ -18,14 +18,5 @@
     <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\contract\contract.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <CompilerVisibleProperty Include="ApiGenAssemblyToScan" />
-    <CompilerVisibleProperty Include="ApiGenGenerateClient" />
-  </ItemGroup>
-  
-  <PropertyGroup>
-    <ApiGenAssemblyToScan>contract</ApiGenAssemblyToScan>
-    <ApiGenGenerateClient>true</ApiGenGenerateClient>
-  </PropertyGroup>
+
 </Project>
