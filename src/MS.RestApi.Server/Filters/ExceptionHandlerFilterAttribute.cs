@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
@@ -10,99 +9,98 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MS.RestApi.Error;
 using MS.RestApi.Errors;
 using MS.RestApi.Server.Exceptions;
+using MS.RestApi.Server.Extensions;
 
-namespace MS.RestApi.Server.Filters
+namespace MS.RestApi.Server.Filters;
+
+public class ExceptionHandlerFilterAttribute : ExceptionFilterAttribute
 {
-    public class ExceptionHandlerFilterAttribute : ExceptionFilterAttribute
+    private readonly IEnumerable<IExceptionHandler> _handlers;
+
+    public ExceptionHandlerFilterAttribute(IEnumerable<IExceptionHandler> handlers)
     {
-        private readonly IEnumerable<IExceptionHandler> _handlers;
-
-        public ExceptionHandlerFilterAttribute(IEnumerable<IExceptionHandler> handlers)
-        {
-            _handlers = handlers;
-        }
+        _handlers = handlers;
+    }
         
-        public override void OnException(ExceptionContext context)
+    public override void OnException(ExceptionContext context)
+    {
+        if (context.ExceptionHandled || context.Exception == null)
         {
-            if (context.ExceptionHandled || context.Exception == null)
-            {
-                return;
-            }
+            return;
+        }
             
-            var error = default(ApiError);
-            var exception = context.Exception;
+        var error = default(ApiError);
+        var exception = context.Exception;
 
-            if (exception is TargetInvocationException tie)
-            {
-                exception = tie.InnerException;
-            }
-
-            if (exception is AggregateException ae)
-            {
-                exception = ae.InnerException;
-            }
-
-            exception ??= context.Exception;
-
-            if (exception is ApiException apiException)
-            {
-                error = apiException.Error;
-            }
-            
-            if (error == null)
-            {
-                foreach (var handler in _handlers)
-                {
-                    if (handler.Handle(exception, out error))
-                    {
-                        break;
-                    }
-                }
-            }
-            
-            if (exception is InvalidModelStateException {ModelState: {ErrorCount: > 0} state})
-            {
-                error = new ValidationApiError
-                {
-                    Reason = $"Validation errors occurred. See the '{nameof(ValidationApiError.Detail)}' for details.",
-                    Detail = context.ModelState.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray()),
-                    LogMessage = BuildValidationErrorMessage(state),
-                };
-            }
-
-            error ??= new GenericApiError
-            {
-                Reason = $"An unhandled error occured: {exception.Message}",
-                LogMessage = exception.ToString(),
-            };
-
-            if (context.HttpContext.Response is {HasStarted: false} response)
-            {
-                response.Headers.Add("X-Error-Type", $"{error.GetType().FullName}, {error.GetType().Assembly.GetName().Name}");
-            }
-            
-            context.Result = new ObjectResult(error)
-            {
-                StatusCode = (int) HttpStatusCode.InternalServerError,
-            };
-            context.ExceptionHandled = true;
+        if (exception is TargetInvocationException tie)
+        {
+            exception = tie.InnerException;
         }
 
-        private string BuildValidationErrorMessage(ModelStateDictionary modelState)
+        if (exception is AggregateException ae)
         {
-            var sb = new StringBuilder().AppendLine("Model validation errors occured.");
+            exception = ae.InnerException;
+        }
 
-            foreach (var item in modelState)
+        exception ??= context.Exception;
+
+        if (exception is ApiException apiException)
+        {
+            error = apiException.ApiError;
+        }
+            
+        if (error == null)
+        {
+            foreach (var handler in _handlers)
             {
-                sb.AppendLine($"Path: {item.Key}");
-
-                foreach (var error in item.Value.Errors)
+                if (handler.Handle(exception, out error))
                 {
-                    sb.AppendLine($"\t{error.ErrorMessage}");
+                    break;
                 }
             }
-
-            return sb.ToString();
         }
+            
+        if (exception is InvalidModelStateException {ModelState: {ErrorCount: > 0} state})
+        {
+            var detail = state.ToDictionary(t => t.Key, t => t.Value.Errors.Select(e => e.ErrorMessage).ToArray());
+            var reason = state.SelectMany(t => t.Value.Errors).Take(3).Select(t => t.ErrorMessage).Join(", ");
+            
+            error = new ValidationApiError
+            {
+                Reason = $"Validation errors: {reason}",
+                Detail = detail,
+                LogMessage = BuildValidationErrorMessage(state),
+            };
+        }
+
+        error ??= new GenericApiError
+        {
+            Reason = $"An unhandled error occured: {exception.Message}",
+            LogMessage = exception.ToString(),
+        };
+        
+        context.HttpContext.Response.Headers.Add("X-Error-Type", $"{error.GetType().GetFullNameWithAssembly()}");
+        context.Result = new ObjectResult(error)
+        {
+            StatusCode = 555,
+        };
+        context.ExceptionHandled = true;
+    }
+
+    private string BuildValidationErrorMessage(ModelStateDictionary modelState)
+    {
+        var sb = new StringBuilder().AppendLine("Model validation errors occured.");
+
+        foreach (var item in modelState)
+        {
+            sb.AppendLine($"Path: {item.Key}");
+
+            foreach (var error in item.Value.Errors)
+            {
+                sb.AppendLine($"\t{error.ErrorMessage}");
+            }
+        }
+
+        return sb.ToString();
     }
 }

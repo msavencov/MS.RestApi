@@ -1,4 +1,3 @@
-﻿namespace MS.RestApi.Abstractions
-{
-    public interface IApiService { }
-}
+﻿namespace MS.RestApi.Abstractions;
+
+public interface IApiService { }

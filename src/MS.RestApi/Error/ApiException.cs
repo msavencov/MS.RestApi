@@ -1,27 +1,21 @@
 ﻿using System;
 
-namespace MS.RestApi.Error
+namespace MS.RestApi.Error;
+
+public abstract class ApiException : Exception
 {
-    public abstract class ApiException : Exception
+    public abstract ApiError ApiError { get; } 
+        
+    protected ApiException(string message) : base(message)
     {
-        protected ApiException(string message) : base(message)
-        {
-        }
+    }
 
-        protected ApiException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+    protected ApiException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 
-        public ApiError Error { get; protected set; }
-
-        public override string ToString()
-        {
-            if (Error is not { })
-            {
-                return base.ToString();
-            }
-
-            return $"The API error occured: [{Error.Code}]: {Error.Reason}. {Environment.NewLine}{base.ToString()}";
-        }
+    public override string ToString()
+    {
+        return $"{GetType().FullName}: {ApiError}{Environment.NewLine}{StackTrace}";
     }
 }

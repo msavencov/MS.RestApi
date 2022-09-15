@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using contract.Account;
 using MS.RestApi.Client;
 using MS.RestApi.Client.Exceptions;
+using MS.RestApi.Errors;
 
 [assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateClient", true)]
 [assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new[] {"contract"})]
@@ -22,26 +23,18 @@ namespace client
             var services = BuildServiceProvider();
             var accountApi = services.GetRequiredService<IAccountApi>();
 
+            var model = new SignInLocal
+            {
+                Password = "dasdasd",
+                Username = "ad@ad@ad",
+            };
             try
             {
-                var model = new SignInLocal
-                {
-                    Password = "dasdasd",
-                    Username = "ad@ad@ad",
-                };
                 var result = await accountApi.SignInLocalAsync(model, CancellationToken.None);
             }
-            catch (ApiRemoteErrorException apiException)
+            catch (Exception e)
             {
-                // handle API error
-            }
-            catch (ApiClientException clientException)
-            {
-                // 
-            }
-            catch (Exception exception)
-            {
-                //
+                Console.WriteLine(e.ToString());
             }
         }
 
@@ -51,7 +44,7 @@ namespace client
             services.AddHttpClient<IGeneratedApiRequestHandler, DefaultRequestHandler>()
                     .ConfigureHttpClient(client =>
                     {
-                        client.BaseAddress = new Uri("http://localhost:5269/api");
+                        client.BaseAddress = new Uri("http://localhost:5269/api/");
                     });
             services.AddGeneratedApi(options =>
             {

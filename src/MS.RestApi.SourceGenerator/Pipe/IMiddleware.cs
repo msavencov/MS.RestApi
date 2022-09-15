@@ -1,7 +1,6 @@
-namespace MS.RestApi.SourceGenerator.Pipe
+namespace MS.RestApi.SourceGenerator.Pipe;
+
+internal interface IMiddleware<TContext>
 {
-    internal interface IMiddleware<TContext>
-    {
-        public void Execute(TContext context);
-    }
+    public void Execute(TContext context);
 }

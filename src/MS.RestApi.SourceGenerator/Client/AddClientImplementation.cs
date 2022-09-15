@@ -6,75 +6,74 @@ using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Pipe;
 using MS.RestApi.SourceGenerator.Utils;
 
-namespace MS.RestApi.SourceGenerator.Client
+namespace MS.RestApi.SourceGenerator.Client;
+
+internal class AddClientImplementation : IMiddleware<ApiGenContext>
 {
-    internal class AddClientImplementation : IMiddleware<ApiGenContext>
+    public void Execute(ApiGenContext context)
     {
-        public void Execute(ApiGenContext context)
-        {
-            var config = context.Config;
-            var symbol = context.KnownSymbols;
-            var services = context.Requests.AsServices();
+        var config = context.Config;
+        var symbol = context.KnownSymbols;
+        var services = context.Requests.AsServices();
 
-            var symbolComparer = SymbolEqualityComparer.Default;
-            var requestHandlerInterface = ApiGenSymbols.GetClientRequestHandlerInterface(symbol, config);
-            var requestHandlerInterfaceName = $"{requestHandlerInterface.ContainingNamespace}.{requestHandlerInterface.InterfaceName}";
+        var symbolComparer = SymbolEqualityComparer.Default;
+        var requestHandlerInterface = ApiGenSymbols.GetClientRequestHandlerInterface(symbol, config);
+        var requestHandlerInterfaceName = $"{requestHandlerInterface.ContainingNamespace}.{requestHandlerInterface.InterfaceName}";
             
-            foreach (var service in services)
-            {
-                var builder = new StringBuilder();
-                var writer = new IndentedWriter(builder, 0);
+        foreach (var service in services)
+        {
+            var builder = new StringBuilder();
+            var writer = new IndentedWriter(builder, 0);
 
-                var clientApiName = ApiGenRequest.BuildClientName(service.ServiceName);
-                var clientInterfaceName = ApiGenRequest.BuildInterfaceName(service.ServiceName);
-                var clientInterfaceFullName = $"{config.ClientServicesNamespace}.{clientInterfaceName}";
-                var cancellationTokenType = symbol.CancellationToken.FullName();
+            var clientApiName = ApiGenRequest.BuildClientName(service.ServiceName);
+            var clientInterfaceName = ApiGenRequest.BuildInterfaceName(service.ServiceName);
+            var clientInterfaceFullName = $"{config.ClientServicesNamespace}.{clientInterfaceName}";
+            var cancellationTokenType = symbol.CancellationToken.FullName();
                 
-                writer.WriteLine($"namespace {config.ClientServicesImplNamespace}");
-                writer.WriteBlock(nsw =>
+            writer.WriteLine($"namespace {config.ClientServicesImplNamespace}");
+            writer.WriteBlock(nsw =>
+            {
+                nsw.WriteLine($"internal class {clientApiName} : {clientInterfaceFullName}");
+                nsw.WriteBlock(cw =>
                 {
-                    nsw.WriteLine($"internal class {clientApiName} : {clientInterfaceFullName}");
-                    nsw.WriteBlock(cw =>
+                    cw.WriteLine($"private readonly {requestHandlerInterfaceName} _httpRequestHandler;");
+                    cw.WriteLine();
+                    cw.WriteLine($"public {clientApiName}({requestHandlerInterfaceName} httpRequestHandler)");
+                    cw.WriteBlock(mw =>
                     {
-                        cw.WriteLine($"private readonly {requestHandlerInterfaceName} _httpRequestHandler;");
+                        mw.WriteLine("_httpRequestHandler = httpRequestHandler;");
+                    });
+
+                    foreach (var action in service.Operations)
+                    {
+                        var responseType = action.GetResponseTypeName(context);
+                        var requestType = action.Request.FullName();
+
                         cw.WriteLine();
-                        cw.WriteLine($"public {clientApiName}({requestHandlerInterfaceName} httpRequestHandler)");
+                        cw.WriteLine($"public {responseType} {action.GetMethodName()}({requestType} model, {cancellationTokenType} ct = default)");
                         cw.WriteBlock(mw =>
                         {
-                            mw.WriteLine("_httpRequestHandler = httpRequestHandler;");
-                        });
+                            var resource = action.EndPoint.Path.Trim('/').Quote();
+                            var handlerTypeArgs = action.Request.FullName();
 
-                        foreach (var action in service.Operations)
-                        {
-                            var responseType = action.GetResponseTypeName(context);
-                            var requestType = action.Request.FullName();
-
-                            cw.WriteLine();
-                            cw.WriteLine($"public {responseType} {action.GetMethodName()}({requestType} model, {cancellationTokenType} ct = default)");
-                            cw.WriteBlock(mw =>
+                            if (symbolComparer.Equals(action.Response, symbol.Task) == false)
                             {
-                                var resource = action.EndPoint.Path.Trim('/').Quote();
-                                var handlerTypeArgs = action.Request.FullName();
+                                handlerTypeArgs += $", {action.Response.FullName()}";
+                            }
 
-                                if (symbolComparer.Equals(action.Response, symbol.Task) == false)
-                                {
-                                    handlerTypeArgs += $", {action.Response.FullName()}";
-                                }
-
-                                mw.WriteLine($"return _httpRequestHandler.HandleAsync<{handlerTypeArgs}>({resource}, model, ct);");
-                            });
-                        }
-                    });
+                            mw.WriteLine($"return _httpRequestHandler.HandleAsync<{handlerTypeArgs}>({resource}, model, ct);");
+                        });
+                    }
                 });
+            });
                 
-                var sourceCode = new ApiGenSourceCode
-                {
-                    Name = $"{config.ClientServicesImplNamespace}.{service.ServiceName}.cs",
-                    Source = builder.ToString()
-                };
+            var sourceCode = new ApiGenSourceCode
+            {
+                Name = $"{config.ClientServicesImplNamespace}.{service.ServiceName}.cs",
+                Source = builder.ToString()
+            };
                 
-                context.SourceCode.Add(sourceCode);
-            }
+            context.SourceCode.Add(sourceCode);
         }
     }
 }

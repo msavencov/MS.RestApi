@@ -1,8 +1,7 @@
-namespace MS.RestApi.SourceGenerator.Utils
+namespace MS.RestApi.SourceGenerator.Utils;
+
+internal class ApiGenSourceCode
 {
-    internal class ApiGenSourceCode
-    {
-        public string Name { get; set; }
-        public string Source { get; set; }
-    }
+    public string Name { get; set; }
+    public string Source { get; set; }
 }

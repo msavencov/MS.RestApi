@@ -1,14 +1,18 @@
 using System;
-using System.Net.Http;
 
 namespace MS.RestApi.Client.Exceptions;
 
 public class ApiClientException : Exception
 {
-    public ApiClientException(string message, HttpResponseMessage response, Exception innerException = null) : base(message, innerException)
+    internal ApiClientException()
     {
-        Response = response;
     }
 
-    public HttpResponseMessage Response { get; }
+    internal ApiClientException(string message) : base(message)
+    {
+    }
+
+    internal ApiClientException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 }

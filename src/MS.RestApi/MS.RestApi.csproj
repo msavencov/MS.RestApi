@@ -4,4 +4,11 @@
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Update="Error\ValidationApiError.cs">
+        <LinkBase>Errors\</LinkBase>
+        <Link>Errors\ValidationApiError.cs</Link>
+      </Compile>
+    </ItemGroup>
+
 </Project>
