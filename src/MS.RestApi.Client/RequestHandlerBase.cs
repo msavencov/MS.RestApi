@@ -98,9 +98,10 @@ public class RequestHandlerBase : IRequestHandler
             throw new ApiErrorException(error);
         }
 
-        throw new ApiRequestException
+        throw new ApiRequestException($"The API response received `{response.StatusCode}: {response.ReasonPhrase}` is not implemented.")
         {
             RequestUrl = message.RequestUri.AbsoluteUri,
+            RequestBody = body,
             ResponseCode = (int) response.StatusCode,
             ResponsePhrase = response.ReasonPhrase,
             ResponseBody = responseBody

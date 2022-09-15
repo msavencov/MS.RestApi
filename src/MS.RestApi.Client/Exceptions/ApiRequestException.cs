@@ -1,14 +1,17 @@
 using System;
+using System.Linq;
+using MS.RestApi.Client.Extensions;
 
 namespace MS.RestApi.Client.Exceptions;
 
 public class ApiRequestException : ApiClientException
 {
-    internal ApiRequestException()
+    internal ApiRequestException(string message) : base(message)
     {
     }
 
     public string RequestUrl { get; internal set; }
+    public string RequestBody { get; internal set; }
     public int ResponseCode { get; internal set; }
     public string ResponsePhrase { get; internal set; }
     public string ResponseBody { get; internal set; }
@@ -19,10 +22,11 @@ public class ApiRequestException : ApiClientException
         var log = new[]
         {
             $"HTTP Request Url: {RequestUrl}",
+            $"HTTP Request Body: {RequestBody}",
             $"HTTP Response Code: {ResponseCode}",
             $"HTTP Response Phrase: {ResponsePhrase}",
             $"HTTP Response Body: {ResponseBody}",
         };
-        return $"{GetType().FullName}: {nl}{string.Join(Environment.NewLine, log)}{nl}{StackTrace}";
+        return $"{base.ToString()}{nl}{log.Join(nl)}";
     }
 }
