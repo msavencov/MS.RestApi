@@ -15,16 +15,16 @@ namespace MS.RestApi.Server.Filters;
 
 public class ExceptionHandlerFilterAttribute : ExceptionFilterAttribute
 {
-    private readonly IEnumerable<IExceptionHandler> _handlers;
+    private readonly IEnumerable<IServerExceptionHandler> _handlers;
 
-    public ExceptionHandlerFilterAttribute(IEnumerable<IExceptionHandler> handlers)
+    public ExceptionHandlerFilterAttribute(IEnumerable<IServerExceptionHandler> handlers)
     {
         _handlers = handlers;
     }
-        
+    
     public override void OnException(ExceptionContext context)
     {
-        if (context.ExceptionHandled || context.Exception == null)
+        if (context.ExceptionHandled)
         {
             return;
         }
