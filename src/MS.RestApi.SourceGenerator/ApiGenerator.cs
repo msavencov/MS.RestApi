@@ -14,7 +14,7 @@ public class ApiGenerator : IIncrementalGenerator
 {
     static ApiGenerator()
     {
-        //while (Debugger.IsAttached == false) Thread.Sleep(1_000);
+        //while (System.Diagnostics.Debugger.IsAttached == false) System.Threading.Thread.Sleep(1_000);
     }
 
     public static readonly Assembly Assembly = typeof(ApiGenerator).Assembly;
@@ -35,7 +35,7 @@ public class ApiGenerator : IIncrementalGenerator
         });
         generatorContext.RegisterPostInitializationOutput(initializationContext =>
         {
-            initializationContext.AddSource("MS.RestApi.ApiGenOptionsAttribute.cs", Assembly.ReadEmbeddedResource("ApiGenOptionsAttribute.liquid"));
+            initializationContext.AddSource("MS.RestApi.ApiGenOptionsAttribute.cs", Assembly.ReadEmbeddedResource("ApiGenOptionsAttribute.tpl"));
         });
     }
 
@@ -52,7 +52,7 @@ public class ApiGenerator : IIncrementalGenerator
             {
                 Compilation = compilation,
                 Options = new ApiGenOptions(attribute),
-                KnownSymbols = symbols,
+                Symbols = symbols,
                 CancellationToken = token
             };
         }

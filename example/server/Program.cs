@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new []{"contract"})]
-[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateControllers", true)]
-[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("UseMediatorHandlers", true)]
+[assembly: MS.RestApi.ApiGenOptions(ContractAssembly = "contract", ApiName = "MyApi", RootNamespace = "My.App", GenerateControllers = true, UseMediatorHandlers = true, GenerateServices = true)]
 
 namespace server
 {

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Reflection;
+using MS.RestApi.SourceGenerator.Exceptions;
 
 namespace MS.RestApi.SourceGenerator.Extensions;
 
@@ -19,6 +20,6 @@ internal static class ReflectionExtensions
             }
         }
 
-        return null;
+        throw new ApiGenException(1, $"The resource {resourceNameEndsWith} not found.");
     }
 }

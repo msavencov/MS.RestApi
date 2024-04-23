@@ -12,9 +12,10 @@ internal class AddServices : IMiddleware<ApiGenContext>
     {
         foreach (var (serviceName, requests) in context.Services)
         {
+            var serviceInterface = context.Options.ServerConventions.ServiceInterface(serviceName);
             var service = new ApiGenSourceCode
             {
-                Name = $"{context.Options.ServerConventions.ServiceNamespace}.{serviceName}.cs",
+                Name = $"{serviceInterface.Namespace}.{serviceInterface.Name}.cs",
                 Source = BuildServiceSourceCode(context, serviceName, requests),
             };
             context.Result.Add(service);
@@ -26,13 +27,14 @@ internal class AddServices : IMiddleware<ApiGenContext>
         var builder = new StringBuilder();
         var writer = new IndentedWriter(builder, 0);
         
-        var symbol = context.KnownSymbols;
+        var symbol = context.Symbols;
         var conventions = context.Options.ServerConventions;
         var service = conventions.ServiceInterface(serviceName);
         
         writer.WriteLine($"namespace {service.Namespace}");
         writer.WriteBlock(nsw =>
         {
+            nsw.WriteLine($"/// <inheritdoc/>");
             nsw.WriteLine($"public interface {service.Name} : {symbol.IApiService.ToDisplayString()}");
             nsw.WriteBlock(cw =>
             {
@@ -42,9 +44,8 @@ internal class AddServices : IMiddleware<ApiGenContext>
                     var model = request.Request.ToDisplayString();
                     var returnResult = request.GetResponseTypeName(symbol.Task);
                     
-                    var method = $"{returnResult} {serviceName}({model} model, {ct} token = default);";
-
-                    cw.WriteLine(method);
+                    cw.WriteLine($"/// <inheritdoc cref=\"{model}\"/>");
+                    cw.WriteLine($"{returnResult} {request.Request.Name}({model} model, {ct} token = default);");
                 }
             });
         });

@@ -62,9 +62,9 @@ public class ClientConventions(ApiGenOptions options)
     public string ServicesImplNamespace => $"{RootNamespace}.Client";
     public string ExtensionsNamespace => $"{RootNamespace}.Extensions";
 
-    public (string Name, string Namespace) GetApiService(string service) => ($"I{service}Service", ServicesNamespace);
+    public (string Name, string Namespace) GetApiService(string service) => ($"I{service}Api", ServicesNamespace);
     public (string Name, string Namespace) GetRequestHandler(INamedTypeSymbol requestHandler) => (requestHandler.Name.Insert(1, options.ApiName), ServicesNamespace);
-    public (string Name, string Namespace) GetClientService(string service) => ($"{service}ServiceClient", ServicesImplNamespace);
+    public (string Name, string Namespace) GetClientService(string service) => ($"{service}ApiClient", ServicesImplNamespace);
 }
 
 public class ServerConventions(ApiGenOptions options)

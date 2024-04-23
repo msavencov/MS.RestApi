@@ -8,7 +8,7 @@ internal class KnownSymbols
 {
     private KnownSymbols(Compilation compilation)
     {
-        ApiGenOptionsAttribute = compilation.GetTypeByMetadataName(Names.ApiGenConfigAttribute);
+        ApiGenOptionsAttribute = compilation.GetTypeByMetadataName(Names.ApiGenConfigAttribute)!;
         IApiService = compilation.GetTypeByMetadataName(Names.IApiService)!;
         EndPointAttribute = compilation.GetTypeByMetadataName(Names.EndPointAttribute)!;
         Request = compilation.GetTypeByMetadataName(Names.Request)!;

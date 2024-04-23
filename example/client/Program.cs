@@ -2,17 +2,13 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using client.GeneratedApi;
 using client.GeneratedApi.Extensions;
 using client.GeneratedApi.Services;
 using Microsoft.Extensions.DependencyInjection;
 using contract.Account;
 using MS.RestApi.Client;
-using MS.RestApi.Client.Exceptions;
-using MS.RestApi.Errors;
 
-[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("GenerateClient", true)]
-[assembly: MS.RestApi.SourceGenerator.ApiGenConfig("AssemblyToScan", new[] {"contract"})]
+[assembly: MS.RestApi.ApiGenOptions(ContractAssembly = "contract", ApiName = "GeneratedApi", RootNamespace = "client", GenerateClient = true)]
 
 namespace client
 {
@@ -30,7 +26,7 @@ namespace client
             };
             try
             {
-                var result = await accountApi.SignInLocalAsync(model, CancellationToken.None);
+                var result = await accountApi.SignInLocal(model, CancellationToken.None);
             }
             catch (Exception e)
             {

@@ -13,7 +13,7 @@ internal class AddClientDIExtensions : IMiddleware<ApiGenContext>
         var writer = new IndentedWriter(builder);
 
         var config = context.Options;
-        var symbol = context.KnownSymbols;
+        var symbol = context.Symbols;
         var conventions = config.ClientConventions;
         
         var serviceCollection = symbol.IServiceCollection.ToDisplayString();

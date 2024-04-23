@@ -11,7 +11,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
     public void Execute(ApiGenContext context)
     {
         var config = context.Options;
-        var symbol = context.KnownSymbols;
+        var symbol = context.Symbols;
         var conventions = config.ClientConventions;
         
         var comparer = SymbolEqualityComparer.Default;
@@ -38,18 +38,17 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
                         var responseType = action.GetResponseTypeName(symbol.Task);
                         var cancellationToken = symbol.CancellationToken.ToDisplayString();
                         
-                        cw.WriteLine();
                         cw.WriteLine($"public {responseType} {request.Name}({requestType} model, {cancellationToken} token = default)");
                         cw.WriteBlock(mw =>
                         {
                             var handlerTypeArgs = requestType;
 
-                            if (comparer.Equals(action.Response, symbol.Task) == false)
+                            if (action.Response is { } response)
                             {
-                                handlerTypeArgs += $", {responseType}";
+                                handlerTypeArgs += $", {response.ToDisplayString()}";
                             }
-
-                            mw.WriteLine($"return handler.HandleAsync<{handlerTypeArgs}>({action.Endpoint}, model, token);");
+                            
+                            mw.WriteLine($"return handler.HandleAsync<{handlerTypeArgs}>(\"{action.Endpoint}\", model, token);");
                         });
                     }
                 });

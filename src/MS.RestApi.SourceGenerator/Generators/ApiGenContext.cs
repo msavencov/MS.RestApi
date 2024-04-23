@@ -10,7 +10,7 @@ internal record ApiGenContext
 {
     public required Compilation Compilation { get; init; }
     public required ApiGenOptions Options { get; init; } = null!;
-    public required KnownSymbols KnownSymbols { get; init; } = null!;
+    public required KnownSymbols Symbols { get; init; } = null!;
     public CancellationToken CancellationToken { get; init; }
 
     public IEnumerable<(string Service, HashSet<ApiRequestDescriptor> Actions)> Services => _services ??= _requests.Select(t => (t.Key, t.Value)).ToList();

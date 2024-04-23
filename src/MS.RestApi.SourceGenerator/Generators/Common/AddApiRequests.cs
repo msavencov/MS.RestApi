@@ -12,7 +12,7 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
     {
         var comparer = SymbolEqualityComparer.Default;
         var compilation = context.Compilation;
-        var symbols = context.KnownSymbols;
+        var symbols = context.Symbols;
         
         foreach (var request in compilation.GetNamedTypeFromReferencedAssembly(context.Options.ContractAssembly))
         {
@@ -24,7 +24,6 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
                 continue;
             }
             
-            var valid = false;
             var response = default(INamedTypeSymbol?);
 
             for (var baseType = request.BaseType; baseType is { }; baseType = baseType.BaseType)
@@ -32,17 +31,12 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
                 if (baseType.IsGenericType && comparer.Equals(baseType.BaseType, symbols.Request))
                 {
                     response ??= (INamedTypeSymbol)baseType.TypeArguments.Single();
+                    break;
                 }
-                valid = valid || comparer.Equals(baseType.BaseType, symbols.Request); 
-            }
-
-            if (!valid)
-            {
-                continue;
             }
 
             var attributes = request.GetAttributes();
-            var endpoint = attributes.Where(t => comparer.Equals(t.AttributeClass, symbols.EndPointAttribute)).Select(MapEndpoint).Single();
+            var endpoint = attributes.Where(t => comparer.Equals(t.AttributeClass, symbols.EndPointAttribute)).Select(MapEndpoint).First();
 
             context.AddRequest(endpoint.Service, new ApiRequestDescriptor
             {
@@ -56,8 +50,8 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
 
     private static (string Service, string Endpoint) MapEndpoint(AttributeData attribute)
     {
-        var service = (string)attribute.ConstructorArguments[0].Value;
-        var endpoint = (string)attribute.ConstructorArguments[1].Value;
+        var service = (string)attribute.ConstructorArguments[1].Value!;
+        var endpoint = (string)attribute.ConstructorArguments[0].Value!;
 
         return (service, endpoint);
     }

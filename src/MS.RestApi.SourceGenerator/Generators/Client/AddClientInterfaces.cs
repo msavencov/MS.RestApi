@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using MS.RestApi.SourceGenerator.Descriptors;
+using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Extensions.Pipe;
 
@@ -10,6 +11,11 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
 {
     public void Execute(ApiGenContext context)
     {
+        if (context.Symbols.ClientRequestHandlerInterface is null)
+        {
+            throw ApiGenException.RequiredAssemblyReference("MS.RestApi.Client");
+        }
+        
         AddClientHandlerInterface(context);
         AddClientServiceInterfaces(context);
     }
@@ -17,7 +23,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
     private void AddClientServiceInterfaces(ApiGenContext context)
     {
         var config = context.Options;
-        var symbols = context.KnownSymbols;
+        var symbols = context.Symbols;
         var conventions = config.ClientConventions;
         
         var builder = new StringBuilder();
@@ -44,9 +50,10 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
     {
         foreach (var (serviceName, requests) in context.Services)
         {
+            var service = context.Options.ClientConventions.GetApiService(serviceName);
             var sourceCode = new ApiGenSourceCode
             {
-                Name = $"{context.Options.ClientConventions.ServicesNamespace}.{serviceName}.cs",
+                Name = $"{service.Namespace}.{service.Name}.cs",
                 Source = BuildInterfaceSourceCode(serviceName, requests, context),
             };
                 
@@ -60,13 +67,14 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
         var writer = new IndentedWriter(builder, 0);
             
         var config = context.Options;
-        var symbol = context.KnownSymbols;
+        var symbol = context.Symbols;
         var conventions = config.ClientConventions;
         var serviceInterface = conventions.GetApiService(service);
         
         writer.WriteLine($"namespace {serviceInterface.Namespace}");
         writer.WriteBlock(ns =>
         {
+            ns.WriteLine($"/// <inheritdoc/>");
             ns.WriteLine($"public interface {serviceInterface.Name} : {symbol.IApiService.ToDisplayString()}");
             ns.WriteBlock(ib =>
             {
