@@ -1,8 +1,8 @@
 using System;
+using System.Linq;
 using System.Text;
-using MS.RestApi.SourceGenerator.Extensions;
 
-namespace MS.RestApi.SourceGenerator.Builder;
+namespace MS.RestApi.SourceGenerator.Extensions;
 
 internal class IndentedWriter
 {
@@ -22,7 +22,7 @@ internal class IndentedWriter
         
     public void WriteLine(string line = "")
     {
-        _builder.AppendLineIndented(_level, line);
+        _builder.AppendLine(string.Join("", Enumerable.Repeat("\t", _level)) + line);
     }
 
     public void WriteBlock(Action<IndentedWriter> inner, string open = "{", string close = "}")

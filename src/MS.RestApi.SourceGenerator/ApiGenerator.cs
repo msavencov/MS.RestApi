@@ -1,0 +1,60 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using Microsoft.CodeAnalysis;
+using MS.RestApi.SourceGenerator.Descriptors;
+using MS.RestApi.SourceGenerator.Extensions;
+using MS.RestApi.SourceGenerator.Generators;
+
+namespace MS.RestApi.SourceGenerator;
+
+[Generator(LanguageNames.CSharp)]
+public class ApiGenerator : IIncrementalGenerator
+{
+    static ApiGenerator()
+    {
+        //while (Debugger.IsAttached == false) Thread.Sleep(1_000);
+    }
+
+    public static readonly Assembly Assembly = typeof(ApiGenerator).Assembly;
+
+    public void Initialize(IncrementalGeneratorInitializationContext generatorContext)
+    {
+        var optionsProvider = generatorContext.CompilationProvider.Select(GetGeneratorContext);
+        
+        generatorContext.RegisterSourceOutput(optionsProvider, (productionContext, descriptors) =>
+        {
+            foreach (var descriptor in descriptors)
+            {
+                foreach (var sourceCode in ApiGenPipeline.Run(descriptor, productionContext.ReportDiagnostic))
+                {
+                    productionContext.AddSource(sourceCode.Name, sourceCode.Source);
+                }
+            }
+        });
+        generatorContext.RegisterPostInitializationOutput(initializationContext =>
+        {
+            initializationContext.AddSource("MS.RestApi.ApiGenOptionsAttribute.cs", Assembly.ReadEmbeddedResource("ApiGenOptionsAttribute.liquid"));
+        });
+    }
+
+    private static IEnumerable<ApiGenContext> GetGeneratorContext(Compilation compilation, CancellationToken token)
+    {
+        var symbols = KnownSymbols.FromCompilation(compilation);
+        var attributes = from t in compilation.Assembly.GetAttributes()
+                         where SymbolEqualityComparer.Default.Equals(t.AttributeClass, symbols.ApiGenOptionsAttribute)
+                         select t;
+
+        foreach (var attribute in attributes)
+        {
+            yield return new ApiGenContext
+            {
+                Compilation = compilation,
+                Options = new ApiGenOptions(attribute),
+                KnownSymbols = symbols,
+                CancellationToken = token
+            };
+        }
+    }
+}
