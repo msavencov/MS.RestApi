@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="contract" />
+        <InternalsVisibleTo Include="compilation" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+        <PackageReference Include="xunit" Version="2.7.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Requests/*.cs"/>
+        <EmbeddedResource Include="Requests/*.cs" />
+        
+        <Compile Remove="Templates/*.cs"/>
+        <EmbeddedResource Include="Templates/*.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
+        <ProjectReference Include="..\MS.RestApi\MS.RestApi.csproj" />
+        <ProjectReference Include="..\MS.RestApi.Client\MS.RestApi.Client.csproj" />
+        <ProjectReference Include="..\MS.RestApi.Server\MS.RestApi.Server.csproj" />
+        <PackageReference Include="MediatR" Version="12.2.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    
+</Project>

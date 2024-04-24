@@ -6,13 +6,9 @@ namespace MS.RestApi.SourceGenerator.Extensions;
 
 internal class IndentedWriter
 {
-    public int IndentLevel => _level;
-        
     private readonly StringBuilder _builder;
     private readonly int _level;
 
-    public IndentedWriter() : this(new StringBuilder(), 0){}
-    public IndentedWriter(int level) : this(new StringBuilder(), level){}
     public IndentedWriter(StringBuilder builder) : this(builder, 0){}
     public IndentedWriter(StringBuilder builder, int level)
     {
@@ -37,10 +33,5 @@ internal class IndentedWriter
         _builder.Append(block);
             
         WriteLine(close);
-    }
-
-    public override string ToString()
-    {
-        return _builder.ToString();
     }
 }

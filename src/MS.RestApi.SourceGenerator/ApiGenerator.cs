@@ -41,7 +41,7 @@ public class ApiGenerator : IIncrementalGenerator
 
     private static IEnumerable<ApiGenContext> GetGeneratorContext(Compilation compilation, CancellationToken token)
     {
-        var symbols = KnownSymbols.FromCompilation(compilation);
+        var symbols = new KnownSymbols(compilation);
         var attributes = from t in compilation.Assembly.GetAttributes()
                          where SymbolEqualityComparer.Default.Equals(t.AttributeClass, symbols.ApiGenOptionsAttribute)
                          select t;

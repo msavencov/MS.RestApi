@@ -11,7 +11,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
 {
     public void Execute(ApiGenContext context)
     {
-        if (context.Symbols.ClientRequestHandlerInterface is null)
+        if (context.Symbols.IRequestHandler is null)
         {
             throw ApiGenException.RequiredAssemblyReference("MS.RestApi.Client");
         }
@@ -29,8 +29,8 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
         var builder = new StringBuilder();
         var writer = new IndentedWriter(builder);
 
-        var requestHandler = symbols.ClientRequestHandlerInterface.ToDisplayString();
-        var apiRequestHandler = conventions.GetRequestHandler(symbols.ClientRequestHandlerInterface);
+        var requestHandler = symbols.IRequestHandler.ToDisplayString();
+        var apiRequestHandler = conventions.GetRequestHandler();
         
         writer.WriteLine($"namespace {apiRequestHandler.Namespace}");
         writer.WriteBlock(nsw =>
@@ -83,10 +83,9 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
                     var ct = symbol.CancellationToken.ToDisplayString();
                     var model = request.Request.ToDisplayString();
                     var methodName = request.Request.Name;
-                    var returnResult = request.GetResponseTypeName(symbol.Task);
-                        
+                    
                     ib.WriteLine($"/// <inheritdoc cref=\"{model}\"/>");
-                    ib.WriteLine($"{returnResult} {methodName}({model} model, {ct} ct = default);");
+                    ib.WriteLine($"{request.ReturnType} {methodName}({model} model, {ct} ct = default);");
                 }
             });
         });

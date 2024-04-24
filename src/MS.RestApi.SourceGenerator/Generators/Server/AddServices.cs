@@ -42,10 +42,9 @@ internal class AddServices : IMiddleware<ApiGenContext>
                 {
                     var ct = symbol.CancellationToken.ToDisplayString();
                     var model = request.Request.ToDisplayString();
-                    var returnResult = request.GetResponseTypeName(symbol.Task);
                     
                     cw.WriteLine($"/// <inheritdoc cref=\"{model}\"/>");
-                    cw.WriteLine($"{returnResult} {request.Request.Name}({model} model, {ct} token = default);");
+                    cw.WriteLine($"{request.ReturnType} {request.Request.Name}({model} model, {ct} token = default);");
                 }
             });
         });

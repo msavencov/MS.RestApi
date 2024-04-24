@@ -19,7 +19,7 @@ public class RequestHandlerBase : IRequestHandler
     {
         Client = client;
     }
-        
+    
     public async Task HandleAsync<TModel>(string resource, TModel model, CancellationToken ct)
     {
         await ExecuteAsync(resource, model, ct);

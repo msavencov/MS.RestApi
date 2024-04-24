@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using MS.RestApi.Client.Extensions;
 
 namespace MS.RestApi.Client.Exceptions;

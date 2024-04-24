@@ -8,9 +8,9 @@ namespace MS.RestApi.SourceGenerator.Descriptors;
 public class ApiGenOptions
 {
     [ApiGenConfig("ContractAssembly")] public string ContractAssembly { get; private set; } = null!;
-    [ApiGenConfig("RootNamespace")] public string RootNamespace { get; private set; } = null!;
+    [ApiGenConfig("RootNamespace")] public string RootNamespace { get; private set; }
 
-    [ApiGenConfig("ApiName")] public string ApiName { get; private set; } = null!;
+    [ApiGenConfig("ApiName")] public string ApiName { get; private set; }
     [ApiGenConfig("ApiBaseRoute")] public string ApiBaseRoute { get; private set; }
     
     [ApiGenConfig("GenerateClient")] public bool GenerateClient { get; private set; }
@@ -38,7 +38,9 @@ public class ApiGenOptions
             property.SetValue(this, value);
         }
 
+        ApiName ??= "GeneratedApi";
         ApiBaseRoute ??= "api";
+        RootNamespace ??= ContractAssembly;
         
         ClientConventions = new ClientConventions(this);
         ServerConventions = new ServerConventions(this);
@@ -63,7 +65,7 @@ public class ClientConventions(ApiGenOptions options)
     public string ExtensionsNamespace => $"{RootNamespace}.Extensions";
 
     public (string Name, string Namespace) GetApiService(string service) => ($"I{service}Api", ServicesNamespace);
-    public (string Name, string Namespace) GetRequestHandler(INamedTypeSymbol requestHandler) => (requestHandler.Name.Insert(1, options.ApiName), ServicesNamespace);
+    public (string Name, string Namespace) GetRequestHandler() => ($"I{options.ApiName}RequestHandler", RootNamespace);
     public (string Name, string Namespace) GetClientService(string service) => ($"{service}ApiClient", ServicesImplNamespace);
 }
 

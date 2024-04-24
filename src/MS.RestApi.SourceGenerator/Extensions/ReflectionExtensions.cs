@@ -20,6 +20,6 @@ internal static class ReflectionExtensions
             }
         }
 
-        throw new ApiGenException(1, $"The resource {resourceNameEndsWith} not found.");
+        throw ApiGenException.EmbeddedResourceMissing(resourceNameEndsWith);
     }
 }

@@ -1,6 +1,4 @@
 using System.Text;
-using Microsoft.CodeAnalysis;
-using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Extensions.Pipe;
 
@@ -13,9 +11,8 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
         var config = context.Options;
         var symbol = context.Symbols;
         var conventions = config.ClientConventions;
-        
-        var comparer = SymbolEqualityComparer.Default;
-        var requestHandler = conventions.GetRequestHandler(symbol.ClientRequestHandlerInterface);
+
+        var requestHandler = conventions.GetRequestHandler();
         var requestHandlerInterface = $"{requestHandler.Namespace}.{requestHandler.Name}";
         
         foreach (var (service, actions) in context.Services)
@@ -35,10 +32,9 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
                     {
                         var request = action.Request;
                         var requestType = request.ToDisplayString();
-                        var responseType = action.GetResponseTypeName(symbol.Task);
                         var cancellationToken = symbol.CancellationToken.ToDisplayString();
                         
-                        cw.WriteLine($"public {responseType} {request.Name}({requestType} model, {cancellationToken} token = default)");
+                        cw.WriteLine($"public {action.ReturnType} {request.Name}({requestType} model, {cancellationToken} token = default)");
                         cw.WriteBlock(mw =>
                         {
                             var handlerTypeArgs = requestType;

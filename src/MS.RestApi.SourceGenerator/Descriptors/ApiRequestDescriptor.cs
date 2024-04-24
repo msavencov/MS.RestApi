@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using MS.RestApi.SourceGenerator.Generators;
 
 namespace MS.RestApi.SourceGenerator.Descriptors;
 
@@ -9,16 +10,5 @@ internal record ApiRequestDescriptor
     
     public required INamedTypeSymbol Request { get; init; } 
     public required INamedTypeSymbol? Response { get; init; }
-    
-    public string GetResponseTypeName(INamedTypeSymbol task)
-    {
-        var responseType = task.ToDisplayString();
-                
-        if (Response is not null)
-        {
-            responseType = $"{responseType}<{Response.ToDisplayString()}>";
-        }
-
-        return responseType;
-    }
+    public string ReturnType => Response is null ? KnownSymbolNames.Task : $"{KnownSymbolNames.Task}<{Response.ToDisplayString()}>";
 }

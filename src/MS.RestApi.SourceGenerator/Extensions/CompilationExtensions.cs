@@ -4,9 +4,9 @@ using Microsoft.CodeAnalysis;
 
 namespace MS.RestApi.SourceGenerator.Extensions;
 
-internal static class CompilationExtensions
+public static class CompilationExtensions
 {
-    private static IEnumerable<INamedTypeSymbol> GetNamespaceMembersRecursive(this INamespaceSymbol namespaceSymbol)
+    public static IEnumerable<INamedTypeSymbol> GetNamespaceMembersRecursive(this INamespaceSymbol namespaceSymbol)
     {
         foreach (var typeMember in namespaceSymbol.GetTypeMembers())
         {

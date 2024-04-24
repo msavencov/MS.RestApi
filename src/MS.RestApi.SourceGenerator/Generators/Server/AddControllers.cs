@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Extensions.Pipe;
@@ -14,9 +13,9 @@ internal class AddControllers : IMiddleware<ApiGenContext>
         var options = context.Options;
         var conventions = options.ServerConventions;
         
-        if (options.UseMediatorHandlers && symbols.Mediator is null)
+        if (options.UseMediatorHandlers && symbols.IMediator is null)
         {
-            throw new ApiGenConfigException(1, "The project should reference the Mediatr package");
+            throw ApiGenException.RequiredAssemblyReference("Mediator");
         }
 
         foreach (var (serviceName, requests) in context.Services)
@@ -25,7 +24,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             var writer = new IndentedWriter(builder, 0);
 
             var service = conventions.ServiceInterface(serviceName);
-            var serviceFullname = options.UseMediatorHandlers ? symbols.Mediator?.ToDisplayString() : $"{service.Namespace}.{service.Name}";
+            var serviceFullname = options.UseMediatorHandlers ? symbols.IMediator?.ToDisplayString() : $"{service.Namespace}.{service.Name}";
             var controller = conventions.ControllerName(serviceName);
             var methodAttribute = symbols.HttpPostAttribute.ToDisplayString();
             var routeAttribute = symbols.RouteAttribute.ToDisplayString();
@@ -42,13 +41,12 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                     foreach (var item in requests)
                     {
                         var request = item.Request;
-                        var responseType = item.GetResponseTypeName(symbols.Task);
                         var serviceMethodName = options.UseMediatorHandlers ? "Send" : request.Name;
                         var requestType = request.ToDisplayString();
                         
                         cb.WriteLine($"/// <inheritdoc cref=\"{requestType}\"/>");
                         cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(item.Endpoint)}\")]");
-                        cb.WriteLine($"public {responseType} {request.Name}([{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
+                        cb.WriteLine($"public {item.ReturnType} {request.Name}([{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
                         cb.WriteBlock(mb =>
                         {
                             mb.WriteLine($"return service.{serviceMethodName}(model, token);");

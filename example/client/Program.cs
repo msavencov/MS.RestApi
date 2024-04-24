@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using client.GeneratedApi;
 using client.GeneratedApi.Extensions;
 using client.GeneratedApi.Services;
 using Microsoft.Extensions.DependencyInjection;

@@ -31,11 +31,6 @@ internal record ApiGenContext
     }
 }
 
-internal record ApiGenService
-{
-    public required string Service { get; init; }
-    public required HashSet<ApiRequestDescriptor> Requests { get; init; } = [];
-}
 internal record ApiGenSourceCode
 {
     public required string Name { get; init; }

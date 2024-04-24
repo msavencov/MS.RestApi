@@ -3,9 +3,14 @@ using Microsoft.CodeAnalysis;
 
 namespace MS.RestApi.SourceGenerator.Exceptions;
 
-internal class ApiGenException(int id, string message) : Exception(message)
+internal class ApiGenException : Exception
 {
-    public int Id { get; } = id;
+    private ApiGenException(int id, string message) : base(message)
+    {
+        Id = id;
+    }
+
+    public int Id { get; }
     public string Category { get; init; } = "ApiGen";
 
     public void ReportDiagnosticError(Action<Diagnostic> reportDiagnostic)
@@ -24,6 +29,17 @@ internal class ApiGenException(int id, string message) : Exception(message)
 
     public static ApiGenException RequiredAssemblyReference(string assembly)
     {
-        return new ApiGenException(1, $"The '{assembly}' assembly should be referenced for client generator.");
+        return new ApiGenException(101, $"The '{assembly}' assembly should be referenced to project.")
+        {
+            Category = "User"
+        };
+    }
+    
+    public static ApiGenException EmbeddedResourceMissing(string resourceNameEndsWith)
+    {
+        return new ApiGenException(1, $"The resource with name ends with '{resourceNameEndsWith}' not found.")
+        {
+            Category = "Core",
+        };
     }
 }
