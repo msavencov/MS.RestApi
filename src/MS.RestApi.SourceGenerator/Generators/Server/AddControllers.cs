@@ -30,7 +30,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             var routeAttribute = symbols.RouteAttribute.ToDisplayString();
             var fromAttribute = symbols.FromBodyAttribute.ToDisplayString();
             
-            writer.WriteLine("#pragma warning disable CS1591"); //Missing XML comment for publicly visible type or member
+            writer.WriteHeaderLines();
             writer.WriteLine($"namespace {controller.Namespace}");
             writer.WriteBlock(ns =>
             {

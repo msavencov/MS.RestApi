@@ -23,6 +23,7 @@ internal class AddClientDIExtensions : IMiddleware<ApiGenContext>
         var serviceDescriptorName = symbol.ServiceDescriptor.ToDisplayString();
         var serviceLifetimeName = symbol.ServiceLifetime.ToDisplayString();
             
+        writer.WriteHeaderLines();
         writer.WriteLine($"namespace {conventions.ExtensionsNamespace}");
         writer.WriteBlock(nsw =>
         {

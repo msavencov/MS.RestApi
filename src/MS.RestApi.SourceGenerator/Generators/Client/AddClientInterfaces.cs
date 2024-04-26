@@ -32,6 +32,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
         var requestHandler = symbols.IRequestHandler.ToDisplayString();
         var apiRequestHandler = conventions.GetRequestHandler();
         
+        writer.WriteHeaderLines();
         writer.WriteLine($"namespace {apiRequestHandler.Namespace}");
         writer.WriteBlock(nsw =>
         {

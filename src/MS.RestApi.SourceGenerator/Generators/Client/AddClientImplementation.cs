@@ -22,6 +22,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
             var api = conventions.GetApiService(service);
             var client = conventions.GetClientService(service);
             
+            writer.WriteHeaderLines();
             writer.WriteLine($"namespace {client.Namespace}");
             writer.WriteBlock(nsw =>
             {

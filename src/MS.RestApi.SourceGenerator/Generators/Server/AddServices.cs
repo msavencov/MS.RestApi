@@ -1,3 +1,4 @@
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Text;
 using MS.RestApi.SourceGenerator.Descriptors;
@@ -31,6 +32,7 @@ internal class AddServices : IMiddleware<ApiGenContext>
         var conventions = context.Options.ServerConventions;
         var service = conventions.ServiceInterface(serviceName);
         
+        writer.WriteHeaderLines();
         writer.WriteLine($"namespace {service.Namespace}");
         writer.WriteBlock(nsw =>
         {
