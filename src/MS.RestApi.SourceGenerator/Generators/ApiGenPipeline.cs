@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
+using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Extensions.Pipe;
 using MS.RestApi.SourceGenerator.Generators.Client;
@@ -14,17 +15,22 @@ internal class ApiGenPipeline : Pipeline<ApiGenContext>
     public ApiGenPipeline(ApiGenContext context) : base(context)
     {
         Add<AddApiRequests>();
-            
-        if (context.Options.GenerateControllers)
+        
+        if (context.Options.GenerateControllers is not GenerateControllers.None)
         {
             Add<AddControllers>();
-                
-            if (context.Options is { GenerateServices: true})
-            {
-                Add<AddServices>();
-            }
         }
-            
+
+        if (context.Options.GenerateServices is GenerateServices.WithService)
+        {
+            Add<AddServices>();
+        }
+        
+        if (context.Options.GenerateServices is GenerateServices.WithMediator)
+        {
+            Add<AddMediator>();
+        }
+        
         if (context.Options.GenerateClient)
         {
             Add<AddClientInterfaces>();

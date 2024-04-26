@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace MS.RestApi.SourceGenerator.Descriptors;
 
-public class ApiGenOptions
+internal class ApiGenOptions
 {
     [ApiGenConfig("ContractAssembly")] public string ContractAssembly { get; private set; } = null!;
     [ApiGenConfig("RootNamespace")] public string RootNamespace { get; private set; }
@@ -14,9 +14,8 @@ public class ApiGenOptions
     [ApiGenConfig("ApiBaseRoute")] public string ApiBaseRoute { get; private set; }
     
     [ApiGenConfig("GenerateClient")] public bool GenerateClient { get; private set; }
-    [ApiGenConfig("GenerateControllers")] public bool GenerateControllers { get; private set; }
-    [ApiGenConfig("GenerateServices")] public bool GenerateServices { get; private set; }
-    [ApiGenConfig("UseMediatorHandlers")] public bool UseMediatorHandlers { get; private set; }
+    [ApiGenConfig("GenerateServices")] public GenerateServices GenerateServices { get; private set; }
+    [ApiGenConfig("GenerateControllers")] public GenerateControllers GenerateControllers { get; private set; }
     
     public ClientConventions ClientConventions { get; private set; }
     public ServerConventions ServerConventions { get; private set; }
@@ -57,7 +56,7 @@ public class ApiGenOptions
     }
 }
 
-public class ClientConventions(ApiGenOptions options)
+internal class ClientConventions(ApiGenOptions options)
 {
     public string RootNamespace => $"{options.RootNamespace}.{options.ApiName}";
     public string ServicesNamespace => $"{RootNamespace}.Services";
@@ -69,7 +68,7 @@ public class ClientConventions(ApiGenOptions options)
     public (string Name, string Namespace) GetClientService(string service) => ($"{service}ApiClient", ServicesImplNamespace);
 }
 
-public class ServerConventions(ApiGenOptions options)
+internal class ServerConventions(ApiGenOptions options)
 {
     public string RootNamespace => $"{options.RootNamespace}.{options.ApiName}";
     public string ControllerNamespace => $"{RootNamespace}.Controllers";
@@ -85,3 +84,6 @@ file class ApiGenConfigAttribute(string name) : Attribute
 {
     public string Name { get; } = name;
 }
+
+internal enum GenerateControllers { None, WithService, WithMediator }
+internal enum GenerateServices { None, WithService, WithMediator }

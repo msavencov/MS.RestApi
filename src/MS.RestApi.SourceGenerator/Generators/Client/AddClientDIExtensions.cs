@@ -59,7 +59,7 @@ internal class AddClientDIExtensions : IMiddleware<ApiGenContext>
 
         var sourceCode = new ApiGenSourceCode
         {
-            Name = $"{conventions.ExtensionsNamespace}.DependencyInjectionExtensions.cs",
+            Name = $"{conventions.ExtensionsNamespace}.DependencyInjectionExtensions.g.cs",
             Source = builder.ToString()
         };
         context.Result.Add(sourceCode);

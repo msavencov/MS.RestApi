@@ -21,7 +21,8 @@ internal class IndentedWriter
         _builder.AppendLine(string.Join("", Enumerable.Repeat("\t", _level)) + line);
     }
 
-    public void WriteBlock(Action<IndentedWriter> inner, string open = "{", string close = "}")
+    public void WriteBlock(Action<IndentedWriter> inner) => WriteBlock("{", "}", inner);
+    public void WriteBlock(string open, string close, Action<IndentedWriter> inner)
     {
         WriteLine(open);
             

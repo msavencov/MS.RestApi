@@ -1,1 +1,0 @@
-﻿[assembly: MS.RestApi.ApiGenOptionsAttribute(ContractAssembly = "contract", GenerateControllers = true, GenerateServices = true, GenerateClient = true)]

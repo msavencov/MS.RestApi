@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Extensions.Pipe;
@@ -12,8 +13,9 @@ internal class AddControllers : IMiddleware<ApiGenContext>
         var symbols = context.Symbols;
         var options = context.Options;
         var conventions = options.ServerConventions;
+        var useMediator = options.GenerateControllers == GenerateControllers.WithMediator;
         
-        if (options.UseMediatorHandlers && symbols.IMediator is null)
+        if (useMediator && symbols.IMediator is null)
         {
             throw ApiGenException.RequiredAssemblyReference("Mediator");
         }
@@ -24,7 +26,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             var writer = new IndentedWriter(builder, 0);
 
             var service = conventions.ServiceInterface(serviceName);
-            var serviceFullname = options.UseMediatorHandlers ? symbols.IMediator?.ToDisplayString() : $"{service.Namespace}.{service.Name}";
+            var serviceFullname = useMediator ? symbols.IMediator?.ToDisplayString() : $"{service.Namespace}.{service.Name}";
             var controller = conventions.ControllerName(serviceName);
             var methodAttribute = symbols.HttpPostAttribute.ToDisplayString();
             var routeAttribute = symbols.RouteAttribute.ToDisplayString();
@@ -41,7 +43,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                     foreach (var item in requests)
                     {
                         var request = item.Request;
-                        var serviceMethodName = options.UseMediatorHandlers ? "Send" : request.Name;
+                        var serviceMethodName = useMediator ? "Send" : request.Name;
                         var requestType = request.ToDisplayString();
                         
                         cb.WriteLine($"/// <inheritdoc cref=\"{requestType}\"/>");
@@ -57,7 +59,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             
             context.Result.Add(new ApiGenSourceCode
             {
-                Name = $"{controller.Namespace}.{controller.Name}.cs",
+                Name = $"{controller.Namespace}.{controller.Name}.g.cs",
                 Source = builder.ToString()
             });
         }

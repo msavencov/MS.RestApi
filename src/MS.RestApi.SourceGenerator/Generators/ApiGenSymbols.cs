@@ -36,4 +36,12 @@ internal class KnownSymbols(Compilation compilation)
     #nullable restore
     
     public readonly ISymbol? IMediator = compilation.GetTypeByMetadataName("MediatR.IMediator");
+    public readonly INamedTypeSymbol MediatorRequestHandler1 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`1")!;
+    public readonly INamedTypeSymbol MediatorRequestHandler2 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`2")!;
+    
+}
+
+internal static class KnownSymbolNames
+{
+    public const string Task = "System.Threading.Tasks.Task";
 }

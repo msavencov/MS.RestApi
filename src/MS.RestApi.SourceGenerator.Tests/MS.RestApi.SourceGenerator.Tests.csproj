@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     
     <ItemGroup>
@@ -35,13 +36,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Requests/*.cs"/>
-        <EmbeddedResource Include="Requests/*.cs" />
-        
-        <Compile Remove="Templates/*.cs"/>
-        <EmbeddedResource Include="Templates/*.cs"/>
+        <Compile Remove="Templates/**/*.cs"/>
+        <EmbeddedResource Include="Templates/**/*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Include="../MS.RestApi.SourceGenerator/Generators/ApiGenSymbols.cs" LinkBase="Import" />
+    </ItemGroup>
+    
     <ItemGroup>
         <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
         <ProjectReference Include="..\MS.RestApi\MS.RestApi.csproj" />
@@ -53,5 +55,5 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
-    
+
 </Project>
