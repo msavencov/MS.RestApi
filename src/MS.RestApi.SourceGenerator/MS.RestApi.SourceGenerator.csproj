@@ -7,10 +7,6 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    
-    <ItemGroup>
-        <InternalsVisibleTo Include="MS.RestApi.SourceGenerator.Tests" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
@@ -18,9 +14,10 @@
     </ItemGroup>
     
     <ItemGroup>
-        <EmbeddedResource Include="@(None -> WithMetadataValue('Extension', '.tpl'))" />
+        <Compile Remove="Template/*.cs" />
+        <EmbeddedResource Include="Template/*.cs" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>

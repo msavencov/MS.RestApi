@@ -42,7 +42,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
             
         context.Result.Add(new ApiGenSourceCode
         {
-            Name = $"{apiRequestHandler.Namespace}.{apiRequestHandler.Name}.cs",
+            Name = $"{apiRequestHandler.Namespace}.{apiRequestHandler.Name}.g.cs",
             Source = builder.ToString()
         });
     }
@@ -54,7 +54,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
             var service = context.Options.ClientConventions.GetApiService(serviceName);
             var sourceCode = new ApiGenSourceCode
             {
-                Name = $"{service.Namespace}.{service.Name}.cs",
+                Name = $"{service.Namespace}.{service.Name}.g.cs",
                 Source = BuildInterfaceSourceCode(serviceName, requests, context),
             };
                 

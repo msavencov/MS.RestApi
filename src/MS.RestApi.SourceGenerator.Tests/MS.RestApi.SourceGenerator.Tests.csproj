@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     
     <ItemGroup>
@@ -43,6 +44,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="../MS.RestApi.SourceGenerator/Generators/ApiGenSymbols.cs" LinkBase="Import" />
+    </ItemGroup>
+    
+    
+    <ItemGroup>
         <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
         <ProjectReference Include="..\MS.RestApi\MS.RestApi.csproj" />
         <ProjectReference Include="..\MS.RestApi.Client\MS.RestApi.Client.csproj" />
@@ -52,6 +58,10 @@
     
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Import\" />
     </ItemGroup>
     
 </Project>

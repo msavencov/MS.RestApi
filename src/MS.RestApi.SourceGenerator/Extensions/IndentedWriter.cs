@@ -16,6 +16,11 @@ internal class IndentedWriter
         _level = level;
     }
         
+    public void Write(string s)
+    {
+        _builder.Append(string.Join("", Enumerable.Repeat("\t", _level)) + s);
+    }
+
     public void WriteLine(string line = "")
     {
         _builder.AppendLine(string.Join("", Enumerable.Repeat("\t", _level)) + line);

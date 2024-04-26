@@ -53,7 +53,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
                 
             var sourceCode = new ApiGenSourceCode
             {
-                Name = $"{conventions.ServicesImplNamespace}.{service}.cs",
+                Name = $"{conventions.ServicesImplNamespace}.{service}.g.cs",
                 Source = builder.ToString()
             };
                 

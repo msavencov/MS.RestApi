@@ -35,7 +35,9 @@ public class ApiGenerator : IIncrementalGenerator
         });
         generatorContext.RegisterPostInitializationOutput(initializationContext =>
         {
-            initializationContext.AddSource("MS.RestApi.ApiGenOptionsAttribute.cs", Assembly.ReadEmbeddedResource("ApiGenOptionsAttribute.tpl"));
+            initializationContext.AddSource("MS.RestApi.GenerateServices.g.cs", Assembly.ReadEmbeddedResource("GenerateServices.cs"));
+            initializationContext.AddSource("MS.RestApi.GenerateControllers.g.cs", Assembly.ReadEmbeddedResource("GenerateControllers.cs"));
+            initializationContext.AddSource("MS.RestApi.ApiGenOptionsAttribute.g.cs", Assembly.ReadEmbeddedResource("ApiGenOptionsAttribute.cs"));
         });
     }
 
