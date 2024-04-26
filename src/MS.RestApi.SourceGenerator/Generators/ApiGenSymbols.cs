@@ -36,8 +36,8 @@ internal class KnownSymbols(Compilation compilation)
     #nullable restore
     
     public readonly ISymbol? IMediator = compilation.GetTypeByMetadataName("MediatR.IMediator");
-    public readonly INamedTypeSymbol IRequestHandler1 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`1")!;
-    public readonly INamedTypeSymbol IRequestHandler2 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`2")!;
+    public readonly INamedTypeSymbol MediatorRequestHandler1 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`1")!;
+    public readonly INamedTypeSymbol MediatorRequestHandler2 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`2")!;
     
 }
 

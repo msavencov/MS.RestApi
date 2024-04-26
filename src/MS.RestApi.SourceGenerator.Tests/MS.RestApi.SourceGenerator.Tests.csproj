@@ -36,17 +36,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Requests/*.cs"/>
-        <EmbeddedResource Include="Requests/*.cs" />
-        
-        <Compile Remove="Templates/*.cs"/>
-        <EmbeddedResource Include="Templates/*.cs"/>
+        <Compile Remove="Templates/**/*.cs"/>
+        <EmbeddedResource Include="Templates/**/*.cs" />
     </ItemGroup>
 
     <ItemGroup>
         <Compile Include="../MS.RestApi.SourceGenerator/Generators/ApiGenSymbols.cs" LinkBase="Import" />
     </ItemGroup>
-    
     
     <ItemGroup>
         <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
@@ -59,9 +55,5 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Import\" />
-    </ItemGroup>
-    
+
 </Project>

@@ -1,20 +1,20 @@
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Extensions;
-using MS.RestApi.SourceGenerator.Generators;
 using MS.RestApi.SourceGenerator.Tests.Extensions;
+using MS.RestApi.SourceGenerator.Tests.Helpers;
 
 namespace MS.RestApi.SourceGenerator.Tests;
 
-public class RequestTests 
+public class WithServicesTests 
 {
-    private static readonly Assembly Assembly = typeof(RequestTests).Assembly;
+    private static readonly Assembly Assembly = typeof(WithServicesTests).Assembly;
     
     [Fact]
-    public void GenerateControllersTest()
+    public void Generate_ControllersWithServicesAndClient()
     {
         // arrange
-        var options = Assembly.ReadEmbeddedResource("Options.cs");
+        var options = Assembly.ReadEmbeddedResource("WithServices.cs");
         var requests = new[] { "Request1.cs", "Request2.cs" }.Select(Assembly.ReadEmbeddedResource);
 
         var contract = CompilationFactory.CreateContractAssembly(requests);
@@ -120,12 +120,5 @@ public class RequestTests
         Assert.Equal(method.ReturnType, result, symbols.Comparer);
 
         return method;
-    }
-
-    private class TestSymbols(Compilation compilation) : KnownSymbols(compilation)
-    {
-        public readonly SymbolEqualityComparer Comparer = SymbolEqualityComparer.Default;
-        public readonly INamedTypeSymbol Request1 = compilation.GetTypeByMetadataName("Templates.Request1")!;
-        public readonly INamedTypeSymbol Request2 = compilation.GetTypeByMetadataName("Templates.Request2")!;
     }
 }

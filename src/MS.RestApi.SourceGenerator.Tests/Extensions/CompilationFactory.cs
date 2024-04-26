@@ -48,7 +48,7 @@ public static class CompilationFactory
     {
         var dependencies = new[]
         {
-            typeof(RequestTests), typeof(Request), typeof(DependencyInjectionExtensions), typeof(IRequestHandler),
+            typeof(WithServicesTests), typeof(Request), typeof(DependencyInjectionExtensions), typeof(IRequestHandler),
             typeof(Binder),typeof(ControllerBase), typeof(IServiceCollection), typeof(IMediator)
         }.Select(t => t.Assembly);
         var references = DefaultReferences().Union(dependencies).Select(t => MetadataReference.CreateFromFile(t.Location)).Union([contract]);

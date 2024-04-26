@@ -11,7 +11,6 @@ internal class AddMediator : IMiddleware<ApiGenContext>
 {
     public void Execute(ApiGenContext context)
     {
-        var options = context.Options;
         var symbols = context.Symbols;
         
         if (symbols.IMediator is null)
@@ -39,26 +38,24 @@ internal class AddMediator : IMiddleware<ApiGenContext>
         var symbol = context.Symbols;
         var conventions = context.Options.ServerConventions;
         var service = conventions.ServiceInterface(serviceName);
-        var interfaces = new List<string>();
-        
+
         writer.WriteHeaderLines();
         writer.WriteLine($"namespace {service.Namespace}");
         writer.WriteBlock(nsw =>
         {
-            nsw.WriteLine($"/// <inheritdoc/>");
             nsw.WriteLine($"public interface {service.Name} : {symbol.IApiService.ToDisplayString()}");
-            nsw.WriteBlock(cw =>
+            nsw.WriteBlock("", "", cw =>
             {
                 foreach (var descriptor in actions)
                 {
                     var @interface = descriptor.Response switch
                     {
-                        null => symbol.IRequestHandler1.Construct(descriptor.Request),
-                        { } response => symbol.IRequestHandler2.Construct(descriptor.Request, response)
+                        null => symbol.MediatorRequestHandler1.Construct(descriptor.Request),
+                        { } response => symbol.MediatorRequestHandler2.Construct(descriptor.Request, response)
                     };
                     cw.WriteLine($", {@interface.ToDisplayString()}");
                 }
-                cw.Write(";");
+                cw.WriteLine(";");
             });
         });
             
