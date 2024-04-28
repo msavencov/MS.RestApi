@@ -20,7 +20,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
         AddClientServiceInterfaces(context);
     }
 
-    private void AddClientServiceInterfaces(ApiGenContext context)
+    private void AddClientHandlerInterface(ApiGenContext context)
     {
         var config = context.Options;
         var symbols = context.Symbols;
@@ -47,7 +47,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
         });
     }
 
-    private void AddClientHandlerInterface(ApiGenContext context)
+    private void AddClientServiceInterfaces(ApiGenContext context)
     {
         foreach (var (serviceName, requests) in context.Services)
         {

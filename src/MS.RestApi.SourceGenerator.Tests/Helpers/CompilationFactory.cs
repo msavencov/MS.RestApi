@@ -68,12 +68,16 @@ public static class CompilationFactory
         return compilation;
     }
 
-    public static GeneratorDriverRunResult CreateAndRunGenerators<TGenerator>(Compilation compilation, out Compilation output) where TGenerator : IIncrementalGenerator, new()
+    public static Compilation CreateAndRunGenerators<TGenerator>(Compilation compilation) where TGenerator : IIncrementalGenerator, new()
     {
         var generator = new TGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-
-        return driver.RunGeneratorsAndUpdateCompilation(compilation, out output, out _).GetRunResult();
+        
+        var result = driver.RunGeneratorsAndUpdateCompilation(compilation, out var output, out _).GetRunResult();
+        
+        Assert.Empty(result.Diagnostics);
+        
+        return output;
     }
 }

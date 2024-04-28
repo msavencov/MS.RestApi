@@ -42,7 +42,7 @@
 
     <ItemGroup>
         <Compile Include="../MS.RestApi.SourceGenerator/Template/ApiGenOptionsAttribute.cs" LinkBase="Import" />
-        <Compile Include="../MS.RestApi.SourceGenerator/Generators/ApiGenSymbols.cs" LinkBase="Import" />
+        <!--<Compile Include="../MS.RestApi.SourceGenerator/Generators/ApiGenSymbols.cs" LinkBase="Import" />-->
     </ItemGroup>
     
     <ItemGroup>

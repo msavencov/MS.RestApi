@@ -12,13 +12,14 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
     {
         var compilation = context.Compilation;
         var symbols = context.Symbols;
+        var helper = new RequestSymbolHelper(symbols);
         var assembly = compilation.SourceModule.ReferencedAssemblySymbols.Single(t => t.Name == context.Options.ContractAssembly);
         
         foreach (var request in assembly.GetNamedTypes())
         {
             context.CancellationToken.ThrowIfCancellationRequested();
             
-            var (valid, response) = GetResponse(request, symbols);
+            var (valid, response) = helper.ValidateRequest(request);
             
             if (valid == false)
             {
@@ -39,30 +40,5 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
                 });
             }
         }
-    }
-
-    private static (bool Valid, INamedTypeSymbol? Response) GetResponse(INamedTypeSymbol request, KnownSymbols symbols)
-    {
-        if (request.FindGenericInterface(symbols.IApiRequest1).SingleOrDefault() is { } ar)
-        {
-            return (true, (INamedTypeSymbol)ar.TypeArguments.Single());
-        }
-        
-        if (request.FindInterface(symbols.IApiRequest).SingleOrDefault() is not null)
-        {
-            return (true, default);
-        }
-        
-        if (request.FindGenericInterface(symbols.MediatorRequest1).SingleOrDefault() is { } @interface)
-        {
-            return (true, (INamedTypeSymbol?)@interface.TypeArguments.Single());
-        }
-
-        if (request.FindInterface(symbols.MediatorRequest).SingleOrDefault() is not null)
-        {
-            return (true, default);
-        }
-
-        return (false, default);
     }
 }

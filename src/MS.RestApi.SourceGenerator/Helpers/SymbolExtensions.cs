@@ -16,7 +16,7 @@ public static class SymbolExtensions
     {
         if (target.IsUnboundGenericType == false)
         {
-            yield break;
+            target = target.ConstructUnboundGenericType();
         }
      
         var comparer = SymbolEqualityComparer.Default;

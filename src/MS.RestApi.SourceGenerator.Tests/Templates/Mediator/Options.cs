@@ -1,3 +1,3 @@
 ﻿using MS.RestApi;
 
-[assembly: MS.RestApi.ApiGenOptionsAttribute(ContractAssembly = "contract", GenerateServices = GenerateServices.WithMediator)]
+[assembly: MS.RestApi.ApiGenOptionsAttribute(ContractAssembly = "contract", GenerateServices = GenerateServices.WithMediator, GenerateControllers = GenerateControllers.WithMediator)]
