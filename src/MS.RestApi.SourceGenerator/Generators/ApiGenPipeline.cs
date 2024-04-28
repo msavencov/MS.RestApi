@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
-using MS.RestApi.SourceGenerator.Extensions.Pipe;
 using MS.RestApi.SourceGenerator.Generators.Client;
 using MS.RestApi.SourceGenerator.Generators.Common;
 using MS.RestApi.SourceGenerator.Generators.Server;
+using MS.RestApi.SourceGenerator.Helpers.Pipe;
 
 namespace MS.RestApi.SourceGenerator.Generators;
 

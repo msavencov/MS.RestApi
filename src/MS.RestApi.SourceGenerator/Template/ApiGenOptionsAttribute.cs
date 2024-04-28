@@ -11,3 +11,6 @@ internal class ApiGenOptionsAttribute : System.Attribute
     public GenerateServices GenerateServices { get; set; } = GenerateServices.None;
     public bool GenerateClient { get; set; }
 }
+
+internal enum GenerateControllers { None, WithService, WithMediator }
+internal enum GenerateServices { None, WithService, WithMediator }

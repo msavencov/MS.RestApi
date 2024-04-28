@@ -9,7 +9,8 @@ internal class KnownSymbols(Compilation compilation)
     #nullable disable
     
     public readonly INamedTypeSymbol ApiGenOptionsAttribute = compilation.GetTypeByMetadataName("MS.RestApi.ApiGenOptionsAttribute");
-    public readonly INamedTypeSymbol Request = compilation.GetTypeByMetadataName("MS.RestApi.Abstractions.Request");
+    public readonly INamedTypeSymbol IApiRequest = compilation.GetTypeByMetadataName("MS.RestApi.Abstractions.IApiRequest");
+    public readonly INamedTypeSymbol IApiRequest1 = compilation.GetTypeByMetadataName("MS.RestApi.Abstractions.IApiRequest`1");
 
     public readonly INamedTypeSymbol IApiService = compilation.GetTypeByMetadataName("MS.RestApi.Abstractions.IApiService");
     public readonly INamedTypeSymbol EndPointAttribute = compilation.GetTypeByMetadataName("MS.RestApi.Abstractions.EndPointAttribute");
@@ -36,9 +37,10 @@ internal class KnownSymbols(Compilation compilation)
     #nullable restore
     
     public readonly ISymbol? IMediator = compilation.GetTypeByMetadataName("MediatR.IMediator");
+    public readonly INamedTypeSymbol MediatorRequest =  compilation.GetTypeByMetadataName("MediatR.IRequest")!;
+    public readonly INamedTypeSymbol MediatorRequest1 =  compilation.GetTypeByMetadataName("MediatR.IRequest`1")?.ConstructUnboundGenericType()!;
     public readonly INamedTypeSymbol MediatorRequestHandler1 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`1")!;
     public readonly INamedTypeSymbol MediatorRequestHandler2 = compilation.GetTypeByMetadataName("MediatR.IRequestHandler`2")!;
-    
 }
 
 internal static class KnownSymbolNames

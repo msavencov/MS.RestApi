@@ -41,11 +41,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="../MS.RestApi.SourceGenerator/Template/ApiGenOptionsAttribute.cs" LinkBase="Import" />
         <Compile Include="../MS.RestApi.SourceGenerator/Generators/ApiGenSymbols.cs" LinkBase="Import" />
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true"/>
+        <ProjectReference Include="..\..\src\MS.RestApi.SourceGenerator\MS.RestApi.SourceGenerator.csproj" />
         <ProjectReference Include="..\MS.RestApi\MS.RestApi.csproj" />
         <ProjectReference Include="..\MS.RestApi.Client\MS.RestApi.Client.csproj" />
         <ProjectReference Include="..\MS.RestApi.Server\MS.RestApi.Server.csproj" />

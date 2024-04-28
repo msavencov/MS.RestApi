@@ -1,8 +1,8 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Descriptors;
-using MS.RestApi.SourceGenerator.Extensions;
-using MS.RestApi.SourceGenerator.Extensions.Pipe;
+using MS.RestApi.SourceGenerator.Helpers;
+using MS.RestApi.SourceGenerator.Helpers.Pipe;
 
 namespace MS.RestApi.SourceGenerator.Generators.Common;
 
@@ -10,49 +10,59 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
 {
     public void Execute(ApiGenContext context)
     {
-        var comparer = SymbolEqualityComparer.Default;
         var compilation = context.Compilation;
         var symbols = context.Symbols;
+        var assembly = compilation.SourceModule.ReferencedAssemblySymbols.Single(t => t.Name == context.Options.ContractAssembly);
         
-        foreach (var request in compilation.GetNamedTypeFromReferencedAssembly(context.Options.ContractAssembly))
+        foreach (var request in assembly.GetNamedTypes())
         {
             context.CancellationToken.ThrowIfCancellationRequested();
-
-            var conversion = compilation.ClassifyCommonConversion(request, symbols.Request);
-            if (conversion is not { Exists: true, IsImplicit: true })
+            
+            var (valid, response) = GetResponse(request, symbols);
+            
+            if (valid == false)
             {
                 continue;
             }
             
-            var response = default(INamedTypeSymbol?);
-
-            for (var baseType = request.BaseType; baseType is { }; baseType = baseType.BaseType)
+            foreach (var attribute in request.FindAttributes(symbols.EndPointAttribute))
             {
-                if (baseType.IsGenericType && comparer.Equals(baseType.BaseType, symbols.Request))
+                var service = (string)attribute.ConstructorArguments[1].Value!;
+                var endpoint = (string)attribute.ConstructorArguments[0].Value!;
+                
+                context.AddRequest(service, new ApiRequestDescriptor
                 {
-                    response ??= (INamedTypeSymbol)baseType.TypeArguments.Single();
-                    break;
-                }
+                    Service = service,
+                    Endpoint = endpoint,
+                    Request = request,
+                    Response = response,
+                });
             }
-
-            var attributes = request.GetAttributes();
-            var endpoint = attributes.Where(t => comparer.Equals(t.AttributeClass, symbols.EndPointAttribute)).Select(MapEndpoint).First();
-
-            context.AddRequest(endpoint.Service, new ApiRequestDescriptor
-            {
-                Service = endpoint.Service,
-                Endpoint = endpoint.Endpoint,
-                Request = request,
-                Response = response,
-            });
         }
     }
 
-    private static (string Service, string Endpoint) MapEndpoint(AttributeData attribute)
+    private static (bool Valid, INamedTypeSymbol? Response) GetResponse(INamedTypeSymbol request, KnownSymbols symbols)
     {
-        var service = (string)attribute.ConstructorArguments[1].Value!;
-        var endpoint = (string)attribute.ConstructorArguments[0].Value!;
+        if (request.FindGenericInterface(symbols.IApiRequest1).SingleOrDefault() is { } ar)
+        {
+            return (true, (INamedTypeSymbol)ar.TypeArguments.Single());
+        }
+        
+        if (request.FindInterface(symbols.IApiRequest).SingleOrDefault() is not null)
+        {
+            return (true, default);
+        }
+        
+        if (request.FindGenericInterface(symbols.MediatorRequest1).SingleOrDefault() is { } @interface)
+        {
+            return (true, (INamedTypeSymbol?)@interface.TypeArguments.Single());
+        }
 
-        return (service, endpoint);
+        if (request.FindInterface(symbols.MediatorRequest).SingleOrDefault() is not null)
+        {
+            return (true, default);
+        }
+
+        return (false, default);
     }
 }

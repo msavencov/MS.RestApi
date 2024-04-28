@@ -8,8 +8,12 @@ using MS.RestApi.Abstractions;
 using MS.RestApi.Client;
 using MS.RestApi.Server;
 
-namespace MS.RestApi.SourceGenerator.Tests.Extensions;
+namespace MS.RestApi.SourceGenerator.Tests.Helpers;
 
+public static class AssertHelper
+{
+    
+}
 public static class CompilationFactory
 {
     private static Assembly[] DefaultReferences()
@@ -27,7 +31,7 @@ public static class CompilationFactory
     public static MetadataReference CreateContractAssembly(IEnumerable<string> source)
     {
         var syntaxTrees = source.Select(t => CSharpSyntaxTree.ParseText(t));
-        var dependencies = new[] { typeof(IApiService) }.Select(t=>t.Assembly);
+        var dependencies = new[] { typeof(IApiService), typeof(MediatR.IRequest) }.Select(t=>t.Assembly);
         var references = DefaultReferences().Union(dependencies).Select(t => MetadataReference.CreateFromFile(t.Location));
         var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, optimizationLevel: OptimizationLevel.Release);
         var compilation = CSharpCompilation.Create("contract", syntaxTrees, references, options);
@@ -48,8 +52,8 @@ public static class CompilationFactory
     {
         var dependencies = new[]
         {
-            typeof(WithServicesTests), typeof(Request), typeof(DependencyInjectionExtensions), typeof(IRequestHandler),
-            typeof(Binder),typeof(ControllerBase), typeof(IServiceCollection), typeof(IMediator)
+            typeof(WithServicesTests), typeof(IApiRequest), typeof(DependencyInjectionExtensions), typeof(IRequestHandler),
+            typeof(Binder),typeof(ControllerBase), typeof(IServiceCollection), typeof(MediatR.IRequest), typeof(IMediator)
         }.Select(t => t.Assembly);
         var references = DefaultReferences().Union(dependencies).Select(t => MetadataReference.CreateFromFile(t.Location)).Union([contract]);
         var syntaxTrees = source.Select(t=> CSharpSyntaxTree.ParseText(t));

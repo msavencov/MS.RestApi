@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Descriptors;
-using MS.RestApi.SourceGenerator.Extensions;
 using MS.RestApi.SourceGenerator.Generators;
+using MS.RestApi.SourceGenerator.Helpers;
 
 namespace MS.RestApi.SourceGenerator;
 
@@ -35,8 +35,6 @@ public class ApiGenerator : IIncrementalGenerator
         });
         generatorContext.RegisterPostInitializationOutput(initializationContext =>
         {
-            initializationContext.AddSource("MS.RestApi.GenerateServices.g.cs", Assembly.ReadEmbeddedResource("GenerateServices.cs"));
-            initializationContext.AddSource("MS.RestApi.GenerateControllers.g.cs", Assembly.ReadEmbeddedResource("GenerateControllers.cs"));
             initializationContext.AddSource("MS.RestApi.ApiGenOptionsAttribute.g.cs", Assembly.ReadEmbeddedResource("ApiGenOptionsAttribute.cs"));
         });
     }

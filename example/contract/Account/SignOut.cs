@@ -7,7 +7,7 @@ namespace contract.Account
     /// Sign out user 
     /// </summary>
     [EndPoint("account/sign-out", "Account")]
-    public class SignOut : Request, IRequest
+    public class SignOut : IApiRequest, MediatR.IRequest
     {
     }
 }

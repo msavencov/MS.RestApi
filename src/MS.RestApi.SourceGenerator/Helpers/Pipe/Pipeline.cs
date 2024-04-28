@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MS.RestApi.SourceGenerator.Extensions.Pipe;
+namespace MS.RestApi.SourceGenerator.Helpers.Pipe;
 
 internal class Pipeline<TContext>
 {

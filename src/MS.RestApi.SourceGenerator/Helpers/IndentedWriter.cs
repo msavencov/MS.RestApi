@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 
-namespace MS.RestApi.SourceGenerator.Extensions;
+namespace MS.RestApi.SourceGenerator.Helpers;
 
 internal class IndentedWriter
 {

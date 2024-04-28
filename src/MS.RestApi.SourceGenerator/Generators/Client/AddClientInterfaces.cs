@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Text;
 using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
-using MS.RestApi.SourceGenerator.Extensions;
-using MS.RestApi.SourceGenerator.Extensions.Pipe;
+using MS.RestApi.SourceGenerator.Helpers;
+using MS.RestApi.SourceGenerator.Helpers.Pipe;
 
 namespace MS.RestApi.SourceGenerator.Generators.Client;
 
