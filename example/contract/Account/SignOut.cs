@@ -1,4 +1,3 @@
-using MediatR;
 using MS.RestApi.Abstractions;
 
 namespace contract.Account
@@ -7,7 +6,7 @@ namespace contract.Account
     /// Sign out user 
     /// </summary>
     [EndPoint("account/sign-out", "Account")]
-    public class SignOut : IApiRequest, MediatR.IRequest
+    public class SignOut : MediatR.IRequest
     {
     }
 }

@@ -17,7 +17,10 @@ namespace server
         {
             services.AddControllers();
             services.AddApiMvcOptions();
-            services.AddMediatR(typeof(Startup));
+            services.AddMediatR(configuration =>
+            {
+                configuration.RegisterServicesFromAssembly(typeof(Startup).Assembly);
+            });
             
             services.AddSwaggerGen(options =>
             {

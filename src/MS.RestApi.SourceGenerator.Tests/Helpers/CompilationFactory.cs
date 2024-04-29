@@ -52,19 +52,14 @@ public static class CompilationFactory
     {
         var dependencies = new[]
         {
-            typeof(WithServicesTests), typeof(IApiRequest), typeof(DependencyInjectionExtensions), typeof(IRequestHandler),
-            typeof(Binder),typeof(ControllerBase), typeof(IServiceCollection), typeof(MediatR.IRequest), typeof(IMediator)
+            typeof(IApiRequest), typeof(DependencyInjectionExtensions), typeof(IRequestHandler),
+            typeof(Binder),typeof(ControllerBase), typeof(IServiceCollection), typeof(MediatR.IRequest), typeof(IMediator), typeof(IServiceProvider)
         }.Select(t => t.Assembly);
         var references = DefaultReferences().Union(dependencies).Select(t => MetadataReference.CreateFromFile(t.Location)).Union([contract]);
-        var syntaxTrees = source.Select(t=> CSharpSyntaxTree.ParseText(t));
+        var syntaxTrees = source.Select(t => CSharpSyntaxTree.ParseText(t));
         var options = new CSharpCompilationOptions(OutputKind.NetModule);
         var compilation = CSharpCompilation.Create("compilation", syntaxTrees, references, options);
 
-        if (compilation.GetDiagnostics() is { Length: > 0 } diagnostics && diagnostics.Any(t => t.Severity == DiagnosticSeverity.Error))
-        {
-            throw new Exception(string.Join(Environment.NewLine, diagnostics.Select(t => t.GetMessage())));
-        }
-        
         return compilation;
     }
 

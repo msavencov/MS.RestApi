@@ -1,9 +1,11 @@
-﻿using MS.RestApi.Abstractions;
+﻿using MediatR;
+using MS.RestApi.Abstractions;
 
-namespace MS.RestApi.SourceGenerator.Tests.Templates.RouteParam;
+namespace Templates.RouteParam;
 
-[EndPoint($"test/{nameof(Id)}", "Test")]
-public class Request : IApiRequest
+[EndPoint("test/{Id}", "Test")]
+public class Request : IRequest<RequestResponse>
 {
-    public int Id { get; set; }
+    public virtual required int Id { get; init; }
 }
+public class RequestResponse;

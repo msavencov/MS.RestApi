@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text;
 
 namespace MS.RestApi.SourceGenerator.Helpers;
@@ -15,10 +14,27 @@ internal class IndentedWriter
         _builder = builder;
         _level = level;
     }
+
+    public IndentedWriter Write(string text)
+    {
+        for (var i = 0; i < _level; i++)
+        {
+            _builder.Append('\t');
+        }
+
+        _builder.Append(text);
         
+        return this;
+    }
+    
     public void WriteLine(string line = "")
     {
-        _builder.AppendLine(string.Join("", Enumerable.Repeat("\t", _level)) + line);
+        for (var i = 0; i < _level; i++)
+        {
+            _builder.Append('\t');
+        }
+
+        _builder.AppendLine(line);
     }
 
     public void WriteBlock(Action<IndentedWriter> inner) => WriteBlock("{", "}", inner);

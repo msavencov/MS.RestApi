@@ -1,8 +1,15 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Helpers;
 using MS.RestApi.SourceGenerator.Helpers.Pipe;
+using MS.RestApi.SourceGenerator.Tests.Helpers;
 
 namespace MS.RestApi.SourceGenerator.Generators.Server;
 
@@ -31,6 +38,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             var methodAttribute = symbols.HttpPostAttribute.ToDisplayString();
             var routeAttribute = symbols.RouteAttribute.ToDisplayString();
             var fromAttribute = symbols.FromBodyAttribute.ToDisplayString();
+            var customModelBuilders = new List<Action<IndentedWriter>>();
             
             writer.WriteHeaderLines();
             writer.WriteLine($"namespace {controller.Namespace}");
@@ -40,21 +48,28 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                 ns.WriteLine($"public class {controller.Name}({serviceFullname} service) : {symbols.ControllerBase.ToDisplayString()}");
                 ns.WriteBlock(cb =>
                 {
-                    foreach (var item in requests)
+                    foreach (var action in requests)
                     {
-                        var request = item.Request;
+                        var request = action.Request;
                         var serviceMethodName = useMediator ? "Send" : request.Name;
-                        var requestType = request.ToDisplayString();
+                        var serviceMethodGenericArgs = useMediator ? $"<{request.ToDisplayString()}>" : "";
+                        var model = BuildCustomRequestType(action, symbols, customModelBuilders);
+                        var requestType = model is not null ? $"{controller.Namespace}.{model}" : request.ToDisplayString();
                         
                         cb.WriteLine($"/// <inheritdoc cref=\"{requestType}\"/>");
-                        cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(item.Endpoint)}\")]");
-                        cb.WriteLine($"public {item.ReturnType} {request.Name}([{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
+                        cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(action.Endpoint)}\")]");
+                        cb.WriteLine($"public {action.ReturnType} {request.Name}Generated([{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
                         cb.WriteBlock(mb =>
                         {
-                            mb.WriteLine($"return service.{serviceMethodName}(model, token);");
+                            mb.WriteLine($"return service.{serviceMethodName}{serviceMethodGenericArgs}(model, token);");
                         });
                     }
                 });
+
+                foreach (var modelBuilder in customModelBuilders)
+                {
+                    modelBuilder(ns);
+                }
             });
             
             context.Result.Add(new ApiGenSourceCode
@@ -63,5 +78,53 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                 Source = builder.ToString()
             });
         }
+    }
+
+    private string? BuildCustomRequestType(ApiRequestDescriptor action, KnownSymbols symbols, ICollection<Action<IndentedWriter>> additionalModelBuilders)
+    {
+        var request = action.Request;
+        var routeArguments = ParseRouteArguments(action);
+
+        if (routeArguments.Count == 0)
+        {
+            return null;
+        }
+        var classOrRecord = request.IsRecord ? "record" : "class";
+        var name = request.Name + "Generated";
+        var modelWriter = new Action<IndentedWriter>(writer =>
+        {
+            writer.WriteLine($"public {classOrRecord} {name} : {request.ToDisplayString()}");
+            writer.WriteBlock(cw =>
+            {
+                foreach (var propertySymbol in routeArguments)
+                {
+                    var modifier = propertySymbol.IsVirtual ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword;
+                    var propertyDeclaration = SymbolHelper.CreatePropertyDeclaration(propertySymbol)
+                                                          .AddModifiers(SyntaxFactory.Token(modifier));
+                    var property = propertyDeclaration.NormalizeWhitespace()
+                                                      .ToFullString();
+                    
+                    cw.WriteLine($"[{symbols.FromRouteAttribute.ToDisplayString()}]");
+                    cw.WriteLine(property);
+                }
+            });
+        });
+        additionalModelBuilders.Add(modelWriter);
+        
+        return name;
+    }
+
+    private static readonly Regex ParseRouteArgumentsRegex = new Regex(@"\{(?<param>\w+)\}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    
+    private List<IPropertySymbol> ParseRouteArguments(ApiRequestDescriptor action)
+    {
+        var matches = ParseRouteArgumentsRegex.Matches(action.Endpoint).OfType<Match>();
+        var parameters = from match in matches.Select(t => t.Groups["param"].Value)
+                         from property in action.Request.GetMembers().OfType<IPropertySymbol>()
+                         where match == property.Name
+                         select property;
+                         
+        
+        return parameters.ToList();
     }
 }

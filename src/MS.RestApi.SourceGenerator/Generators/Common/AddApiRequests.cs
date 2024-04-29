@@ -1,5 +1,4 @@
 using System.Linq;
-using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Helpers;
 using MS.RestApi.SourceGenerator.Helpers.Pipe;
@@ -30,7 +29,7 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
             {
                 var service = (string)attribute.ConstructorArguments[1].Value!;
                 var endpoint = (string)attribute.ConstructorArguments[0].Value!;
-                
+
                 context.AddRequest(service, new ApiRequestDescriptor
                 {
                     Service = service,
