@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using contract.Account;
 using MediatR;
@@ -13,7 +14,7 @@ internal class Account(ISender mediator) :
 {
     public Task<SignInResponse> Handle(SignInLocal request, CancellationToken cancellationToken)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public Task Handle(SignOut request, CancellationToken cancellationToken)
@@ -21,13 +22,8 @@ internal class Account(ISender mediator) :
         return Task.FromResult(Unit.Value);
     }
 
-    public async Task<ProfileDto> Handle(Profile request, CancellationToken cancellationToken)
+    public Task<ProfileDto> Handle(Profile request, CancellationToken cancellationToken)
     {
-        request = request with { Name = "sadasd" };
-
-        return await mediator.Send<Profile>(new ProfileGenerated
-        {
-            Id = 0
-        });
+        throw new NotImplementedException();
     }
 }

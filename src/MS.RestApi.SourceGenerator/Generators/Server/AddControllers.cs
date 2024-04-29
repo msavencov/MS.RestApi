@@ -38,6 +38,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             var methodAttribute = symbols.HttpPostAttribute.ToDisplayString();
             var routeAttribute = symbols.RouteAttribute.ToDisplayString();
             var fromAttribute = symbols.FromBodyAttribute.ToDisplayString();
+            var fromRouteAttribute = symbols.FromRouteAttribute.ToDisplayString();
             var customModelBuilders = new List<Action<IndentedWriter>>();
             
             writer.WriteHeaderLines();
@@ -51,17 +52,32 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                     foreach (var action in requests)
                     {
                         var request = action.Request;
+                        var requestType = request.ToDisplayString();
                         var serviceMethodName = useMediator ? "Send" : request.Name;
-                        var serviceMethodGenericArgs = useMediator ? $"<{request.ToDisplayString()}>" : "";
-                        var model = BuildCustomRequestType(action, symbols, customModelBuilders);
-                        var requestType = model is not null ? $"{controller.Namespace}.{model}" : request.ToDisplayString();
+                        var routeArguments = ParseRouteArguments(action);
+                        var routeArgumentsList = routeArguments.Select(t => $"[{fromRouteAttribute}] {t.Type.ToDisplayString()} {t.Name}, ").Join();
                         
                         cb.WriteLine($"/// <inheritdoc cref=\"{requestType}\"/>");
                         cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(action.Endpoint)}\")]");
-                        cb.WriteLine($"public {action.ReturnType} {request.Name}Generated([{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
+                        cb.WriteLine($"public {action.ReturnType} {request.Name}Generated({routeArgumentsList}[{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
                         cb.WriteBlock(mb =>
                         {
-                            mb.WriteLine($"return service.{serviceMethodName}{serviceMethodGenericArgs}(model, token);");
+                            if (request.IsRecord)
+                            {
+                                foreach (var routeArgument in routeArguments)
+                                {
+                                    mb.WriteLine($"model = model with {{ {routeArgument.Name} = {routeArgument.Name} }};");
+                                }
+                            }
+                            else
+                            {
+                                foreach (var routeArgument in routeArguments)
+                                {
+                                    mb.WriteLine($"model.{routeArgument.Name} = {routeArgument.Name};");
+                                }
+                            }
+                            
+                            mb.WriteLine($"return service.{serviceMethodName}(model, token);");
                         });
                     }
                 });

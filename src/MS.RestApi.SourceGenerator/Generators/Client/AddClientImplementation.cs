@@ -38,6 +38,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
                         cw.WriteLine($"public {action.ReturnType} {request.Name}({requestType} model, {cancellationToken} token = default)");
                         cw.WriteBlock(mw =>
                         {
+                            var method = 
                             var handlerTypeArgs = requestType;
 
                             if (action.Response is { } response)

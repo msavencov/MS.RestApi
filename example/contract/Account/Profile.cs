@@ -7,12 +7,12 @@ namespace contract.Account
     /// Returns account profile by account id
     /// </summary>
     [EndPoint("account/profile/{" + nameof(Id) + "}", "Account")]
-    public record Profile : IRequest<ProfileDto>
+    public class Profile : IRequest<ProfileDto>
     {
         /// <summary>
         /// The account identifier
         /// </summary>
-        public virtual required int Id { get; init; }
+        public required int Id { get; set; }
 
         /// <summary>
         /// 
