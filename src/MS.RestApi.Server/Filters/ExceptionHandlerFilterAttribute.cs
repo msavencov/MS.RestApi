@@ -78,8 +78,8 @@ public class ExceptionHandlerFilterAttribute : ExceptionFilterAttribute
             Reason = $"An unhandled error occured: {exception.Message}",
             LogMessage = exception.ToString(),
         };
-        
-        context.HttpContext.Response.Headers.Add("X-Error-Type", $"{error.GetType().GetFullNameWithAssembly()}");
+
+        context.HttpContext.Response.Headers["X-Error-Type"] = $"{error.GetType().GetFullNameWithAssembly()}";
         context.Result = new ObjectResult(error)
         {
             StatusCode = 555,
