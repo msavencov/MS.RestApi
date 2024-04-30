@@ -4,7 +4,7 @@ using MS.RestApi.SourceGenerator.Generators;
 
 namespace MS.RestApi.SourceGenerator.Helpers;
 
-internal class RequestSymbolHelper(KnownSymbols symbols)
+internal class RequestHelper(KnownSymbols symbols)
 {
     public (bool Valid, INamedTypeSymbol? Response) ValidateRequest(INamedTypeSymbol request)
     {

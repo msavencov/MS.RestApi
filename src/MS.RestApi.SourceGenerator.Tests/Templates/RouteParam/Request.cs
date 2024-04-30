@@ -3,9 +3,18 @@ using MS.RestApi.Abstractions;
 
 namespace Templates.RouteParam;
 
-[EndPoint("test/{Id}", "Test")]
-public class Request : IRequest<RequestResponse>
+[EndPoint("route/parameter/record/{Id}/{Other}", "Test")]
+public record RecordRequest : IRequest
 {
-    public virtual required int Id { get; init; }
+    public required int Id { get; init; }
+    public required int Other { get; init; }
 }
-public class RequestResponse;
+
+[EndPoint("route/parameter/class/{Id}/{Other}", "Test")]
+public class ClassRequest : IRequest
+{
+    public required int Id { get; set; }
+    public required int Other { get; set; }
+}
+
+

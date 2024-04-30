@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Helpers;
 using MS.RestApi.SourceGenerator.Helpers.Pipe;
-using MS.RestApi.SourceGenerator.Tests.Helpers;
 
 namespace MS.RestApi.SourceGenerator.Generators.Server;
 
@@ -54,12 +52,13 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                         var request = action.Request;
                         var requestType = request.ToDisplayString();
                         var serviceMethodName = useMediator ? "Send" : request.Name;
-                        var routeArguments = ParseRouteArguments(action);
+                        var routeArguments = action.GetRouteArguments();
                         var routeArgumentsList = routeArguments.Select(t => $"[{fromRouteAttribute}] {t.Type.ToDisplayString()} {t.Name}, ").Join();
+                        var actionMethodName = $"Post{request.Name}";
                         
                         cb.WriteLine($"/// <inheritdoc cref=\"{requestType}\"/>");
                         cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(action.Endpoint)}\")]");
-                        cb.WriteLine($"public {action.ReturnType} {request.Name}Generated({routeArgumentsList}[{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
+                        cb.WriteLine($"public {action.ReturnType} {actionMethodName}({routeArgumentsList}[{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
                         cb.WriteBlock(mb =>
                         {
                             if (request.IsRecord)
@@ -99,7 +98,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
     private string? BuildCustomRequestType(ApiRequestDescriptor action, KnownSymbols symbols, ICollection<Action<IndentedWriter>> additionalModelBuilders)
     {
         var request = action.Request;
-        var routeArguments = ParseRouteArguments(action);
+        var routeArguments = action.GetRouteArguments();
 
         if (routeArguments.Count == 0)
         {
@@ -128,19 +127,5 @@ internal class AddControllers : IMiddleware<ApiGenContext>
         additionalModelBuilders.Add(modelWriter);
         
         return name;
-    }
-
-    private static readonly Regex ParseRouteArgumentsRegex = new Regex(@"\{(?<param>\w+)\}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    
-    private List<IPropertySymbol> ParseRouteArguments(ApiRequestDescriptor action)
-    {
-        var matches = ParseRouteArgumentsRegex.Matches(action.Endpoint).OfType<Match>();
-        var parameters = from match in matches.Select(t => t.Groups["param"].Value)
-                         from property in action.Request.GetMembers().OfType<IPropertySymbol>()
-                         where match == property.Name
-                         select property;
-                         
-        
-        return parameters.ToList();
     }
 }

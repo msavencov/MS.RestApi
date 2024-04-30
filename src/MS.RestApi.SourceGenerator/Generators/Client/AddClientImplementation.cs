@@ -38,7 +38,26 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
                         cw.WriteLine($"public {action.ReturnType} {request.Name}({requestType} model, {cancellationToken} token = default)");
                         cw.WriteBlock(mw =>
                         {
-                            var method = 
+                            var resource = action.Endpoint.Quote();
+                            
+                            if (action.GetRouteArguments() is { Count: > 0 } routeArguments)
+                            {
+                                mw.WriteLine($"var resource = {action.Endpoint.Quote()};");
+                            
+                                foreach (var routeArgument in routeArguments)
+                                {
+                                    // resource = resource.Replace("{Id}", model.Id);
+                                    var argument = routeArgument.Name.Quote(QuoteType.Braces);
+                                    var propertyName = $"model.{routeArgument.Name}";
+                                    var value = $"{propertyName} is {{}} " +
+                                                $"? {propertyName}.ToString(System.Globalization.CultureInfo.InvariantCulture) " +
+                                                $": throw new System.ArgumentNullException(nameof({propertyName}))";
+
+                                    mw.WriteLine($"resource = resource.Replace({argument.Quote()}, {value});");
+                                }
+
+                                resource = "resource";
+                            }
                             var handlerTypeArgs = requestType;
 
                             if (action.Response is { } response)
@@ -46,7 +65,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
                                 handlerTypeArgs += $", {response.ToDisplayString()}";
                             }
                             
-                            mw.WriteLine($"return handler.HandleAsync<{handlerTypeArgs}>(\"{action.Endpoint}\", model, token);");
+                            mw.WriteLine($"return handler.HandleAsync<{handlerTypeArgs}>({resource}, model, token);");
                         });
                     }
                 });

@@ -11,7 +11,7 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
     {
         var compilation = context.Compilation;
         var symbols = context.Symbols;
-        var helper = new RequestSymbolHelper(symbols);
+        var helper = new RequestHelper(symbols);
         var assembly = compilation.SourceModule.ReferencedAssemblySymbols.Single(t => t.Name == context.Options.ContractAssembly);
         
         foreach (var request in assembly.GetNamedTypes())
