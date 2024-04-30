@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using MediatR;
 using MS.RestApi.Abstractions;
 
 namespace contract.Account
@@ -8,7 +7,7 @@ namespace contract.Account
     /// Signin user and generate access token 
     /// </summary>
     [EndPoint("account/sign-in/local", "Account")]
-    public class SignInLocal : MS.RestApi.Abstractions.IApiRequest<SignInResponse>, MediatR.IRequest<SignInResponse>
+    public class SignInLocal : MediatR.IRequest<SignInResponse>
     {
         /// <summary>
         /// The user's account email 

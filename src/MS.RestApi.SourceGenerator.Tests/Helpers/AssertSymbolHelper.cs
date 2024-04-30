@@ -6,7 +6,7 @@ namespace MS.RestApi.SourceGenerator.Tests.Helpers;
 
 internal class AssertSymbolHelper(KnownSymbols symbols)
 {
-    private readonly RequestSymbolHelper _helper = new(symbols);
+    private readonly RequestHelper _helper = new(symbols);
     public IMethodSymbol AssertRequestMethod(List<IMethodSymbol> methods, INamedTypeSymbol request)
     {
         var method = methods.Single(t => t.Name == request.Name);

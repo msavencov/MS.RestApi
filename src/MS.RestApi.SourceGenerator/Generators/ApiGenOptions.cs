@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 
-namespace MS.RestApi.SourceGenerator.Descriptors;
+namespace MS.RestApi.SourceGenerator.Generators;
 
 internal class ApiGenOptions
 {

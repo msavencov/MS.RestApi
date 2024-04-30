@@ -1,4 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Helpers;
@@ -31,6 +36,8 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             var methodAttribute = symbols.HttpPostAttribute.ToDisplayString();
             var routeAttribute = symbols.RouteAttribute.ToDisplayString();
             var fromAttribute = symbols.FromBodyAttribute.ToDisplayString();
+            var fromRouteAttribute = symbols.FromRouteAttribute.ToDisplayString();
+            var customModelBuilders = new List<Action<IndentedWriter>>();
             
             writer.WriteHeaderLines();
             writer.WriteLine($"namespace {controller.Namespace}");
@@ -40,21 +47,44 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                 ns.WriteLine($"public class {controller.Name}({serviceFullname} service) : {symbols.ControllerBase.ToDisplayString()}");
                 ns.WriteBlock(cb =>
                 {
-                    foreach (var item in requests)
+                    foreach (var action in requests)
                     {
-                        var request = item.Request;
-                        var serviceMethodName = useMediator ? "Send" : request.Name;
+                        var request = action.Request;
                         var requestType = request.ToDisplayString();
+                        var serviceMethodName = useMediator ? "Send" : request.Name;
+                        var routeArguments = action.GetRouteArguments();
+                        var routeArgumentsList = routeArguments.Select(t => $"[{fromRouteAttribute}] {t.Type.ToDisplayString()} {t.Name}, ").Join();
+                        var actionMethodName = $"Post{request.Name}";
                         
                         cb.WriteLine($"/// <inheritdoc cref=\"{requestType}\"/>");
-                        cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(item.Endpoint)}\")]");
-                        cb.WriteLine($"public {item.ReturnType} {request.Name}([{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
+                        cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(action.Endpoint)}\")]");
+                        cb.WriteLine($"public {action.ReturnType} {actionMethodName}({routeArgumentsList}[{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
                         cb.WriteBlock(mb =>
                         {
+                            if (request.IsRecord)
+                            {
+                                foreach (var routeArgument in routeArguments)
+                                {
+                                    mb.WriteLine($"model = model with {{ {routeArgument.Name} = {routeArgument.Name} }};");
+                                }
+                            }
+                            else
+                            {
+                                foreach (var routeArgument in routeArguments)
+                                {
+                                    mb.WriteLine($"model.{routeArgument.Name} = {routeArgument.Name};");
+                                }
+                            }
+                            
                             mb.WriteLine($"return service.{serviceMethodName}(model, token);");
                         });
                     }
                 });
+
+                foreach (var modelBuilder in customModelBuilders)
+                {
+                    modelBuilder(ns);
+                }
             });
             
             context.Result.Add(new ApiGenSourceCode
@@ -63,5 +93,39 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                 Source = builder.ToString()
             });
         }
+    }
+
+    private string? BuildCustomRequestType(ApiRequestDescriptor action, KnownSymbols symbols, ICollection<Action<IndentedWriter>> additionalModelBuilders)
+    {
+        var request = action.Request;
+        var routeArguments = action.GetRouteArguments();
+
+        if (routeArguments.Count == 0)
+        {
+            return null;
+        }
+        var classOrRecord = request.IsRecord ? "record" : "class";
+        var name = request.Name + "Generated";
+        var modelWriter = new Action<IndentedWriter>(writer =>
+        {
+            writer.WriteLine($"public {classOrRecord} {name} : {request.ToDisplayString()}");
+            writer.WriteBlock(cw =>
+            {
+                foreach (var propertySymbol in routeArguments)
+                {
+                    var modifier = propertySymbol.IsVirtual ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword;
+                    var propertyDeclaration = SymbolHelper.CreatePropertyDeclaration(propertySymbol)
+                                                          .AddModifiers(SyntaxFactory.Token(modifier));
+                    var property = propertyDeclaration.NormalizeWhitespace()
+                                                      .ToFullString();
+                    
+                    cw.WriteLine($"[{symbols.FromRouteAttribute.ToDisplayString()}]");
+                    cw.WriteLine(property);
+                }
+            });
+        });
+        additionalModelBuilders.Add(modelWriter);
+        
+        return name;
     }
 }

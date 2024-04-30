@@ -22,6 +22,7 @@ internal class KnownSymbols(Compilation compilation)
     public readonly INamedTypeSymbol RouteAttribute = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.RouteAttribute");
     public readonly INamedTypeSymbol FromBodyAttribute = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.FromBodyAttribute");
     public readonly INamedTypeSymbol FromQueryAttribute = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.FromQueryAttribute");
+    public readonly INamedTypeSymbol FromRouteAttribute = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.FromRouteAttribute");
     public readonly INamedTypeSymbol HttpPostAttribute = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.Mvc.HttpPostAttribute");
 
     public readonly INamedTypeSymbol Action = compilation.GetTypeByMetadataName("System.Action");

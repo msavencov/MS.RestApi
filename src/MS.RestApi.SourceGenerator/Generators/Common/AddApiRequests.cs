@@ -1,5 +1,4 @@
 using System.Linq;
-using Microsoft.CodeAnalysis;
 using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Helpers;
 using MS.RestApi.SourceGenerator.Helpers.Pipe;
@@ -12,7 +11,7 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
     {
         var compilation = context.Compilation;
         var symbols = context.Symbols;
-        var helper = new RequestSymbolHelper(symbols);
+        var helper = new RequestHelper(symbols);
         var assembly = compilation.SourceModule.ReferencedAssemblySymbols.Single(t => t.Name == context.Options.ContractAssembly);
         
         foreach (var request in assembly.GetNamedTypes())
@@ -30,7 +29,7 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
             {
                 var service = (string)attribute.ConstructorArguments[1].Value!;
                 var endpoint = (string)attribute.ConstructorArguments[0].Value!;
-                
+
                 context.AddRequest(service, new ApiRequestDescriptor
                 {
                     Service = service,
