@@ -15,7 +15,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
         var requestHandler = conventions.GetRequestHandler();
         var requestHandlerInterface = $"{requestHandler.Namespace}.{requestHandler.Name}";
         
-        foreach (var (service, actions) in context.Services)
+        foreach (var (service, actions) in context.Services.AsTuple())
         {
             var builder = new StringBuilder();
             var writer = new IndentedWriter(builder, 0);

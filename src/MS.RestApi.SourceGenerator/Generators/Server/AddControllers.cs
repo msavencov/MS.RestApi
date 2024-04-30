@@ -8,6 +8,7 @@ using MS.RestApi.SourceGenerator.Descriptors;
 using MS.RestApi.SourceGenerator.Exceptions;
 using MS.RestApi.SourceGenerator.Helpers;
 using MS.RestApi.SourceGenerator.Helpers.Pipe;
+using MS.RestApi.SourceGenerator.Tests.Helpers;
 
 namespace MS.RestApi.SourceGenerator.Generators.Server;
 
@@ -25,7 +26,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
             throw ApiGenException.RequiredAssemblyReference("Mediator");
         }
 
-        foreach (var (serviceName, requests) in context.Services)
+        foreach (var (serviceName, requests) in context.Services.AsTuple())
         {
             var builder = new StringBuilder();
             var writer = new IndentedWriter(builder, 0);

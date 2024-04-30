@@ -10,7 +10,7 @@ internal class AddServices : IMiddleware<ApiGenContext>
 {
     public void Execute(ApiGenContext context)
     {
-        foreach (var (serviceName, requests) in context.Services)
+        foreach (var (serviceName, requests) in context.Services.AsTuple())
         {
             var serviceInterface = context.Options.ServerConventions.ServiceInterface(serviceName);
             var service = new ApiGenSourceCode

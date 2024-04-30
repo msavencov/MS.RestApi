@@ -49,7 +49,7 @@ internal class AddClientInterfaces : IMiddleware<ApiGenContext>
 
     private void AddClientServiceInterfaces(ApiGenContext context)
     {
-        foreach (var (serviceName, requests) in context.Services)
+        foreach (var (serviceName, requests) in context.Services.AsTuple())
         {
             var service = context.Options.ClientConventions.GetApiService(serviceName);
             var sourceCode = new ApiGenSourceCode

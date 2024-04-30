@@ -36,8 +36,8 @@ internal class AddClientDIExtensions : IMiddleware<ApiGenContext>
                     mw.WriteLine("configureOptions ??= _ => {  };");
                     mw.WriteLine($"var options = new {apiClientOptionsName}();");
                     mw.WriteLine("configureOptions(options);");
-                        
-                    foreach (var service in context.Services.Select(t=>t.Service))
+
+                    foreach (var service in context.Services.Select(t => t.Key))
                     {
                         var api = conventions.GetApiService(service);
                         var client = conventions.GetClientService(service);

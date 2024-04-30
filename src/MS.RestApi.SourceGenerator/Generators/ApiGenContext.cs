@@ -13,21 +13,19 @@ internal record ApiGenContext
     public required KnownSymbols Symbols { get; init; } = null!;
     public CancellationToken CancellationToken { get; init; }
 
-    public IEnumerable<(string Service, HashSet<ApiRequestDescriptor> Actions)> Services => _requests.Select(t => (t.Key, t.Value)).ToList();
-    private IEnumerable<(string Service, HashSet<ApiRequestDescriptor> Actions)>? _services;
-    private readonly Dictionary<string, HashSet<ApiRequestDescriptor>> _requests = [];
+    public readonly Dictionary<string, HashSet<ApiRequestDescriptor>> Services = [];
     
     public HashSet<ApiGenSourceCode> Result { get; } = [];
 
     public void AddRequest(string service, ApiRequestDescriptor request)
     {
-        if (_requests.TryGetValue(service, out var requests))
+        if (Services.TryGetValue(service, out var requests))
         {
             requests.Add(request);
             return;
         }
 
-        _requests[service] = [request];
+        Services[service] = [request];
     }
 }
 

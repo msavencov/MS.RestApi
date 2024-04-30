@@ -18,7 +18,7 @@ internal class AddMediator : IMiddleware<ApiGenContext>
             throw ApiGenException.RequiredAssemblyReference("Mediator");
         }
         
-        foreach (var (serviceName, requests) in context.Services)
+        foreach (var (serviceName, requests) in context.Services.AsTuple())
         {
             var serviceInterface = context.Options.ServerConventions.ServiceInterface(serviceName);
             var service = new ApiGenSourceCode
