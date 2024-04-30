@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using contract.Account;
 using MediatR;
-using My.App.MyApi.Controllers;
 
 namespace server.Services;
 

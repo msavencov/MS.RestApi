@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using MS.RestApi;
 
-[assembly: MS.RestApi.ApiGenOptions(ContractAssembly = "contract", ApiName = "MyApi", RootNamespace = "My.App", GenerateControllers = GenerateControllers.WithMediator)]
+//[assembly: MS.RestApi.ApiGenOptions(ContractAssembly = "contract", ApiName = "MyApi", RootNamespace = "My.App", GenerateControllers = GenerateControllers.WithMediator)]
 
 namespace server
 {

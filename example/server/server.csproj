@@ -19,6 +19,10 @@
     <ProjectReference Include="..\contract\contract.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="Swagger\" />
+  </ItemGroup>
+  
   <PropertyGroup>
     <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
   </PropertyGroup>

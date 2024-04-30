@@ -3,6 +3,7 @@ using contract;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using MS.RestApi.Server;
@@ -15,6 +16,7 @@ namespace server
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddEndpointsApiExplorer();
             services.AddControllers();
             services.AddApiMvcOptions();
             services.AddMediatR(configuration =>
@@ -36,6 +38,7 @@ namespace server
                 {
                     options.IncludeXmlComments(() => new XPathDocument(doc.CreateReader()));
                 }
+                //options.OperationFilter<AttachmentOperationFilterFilter>();
             });
         }
 

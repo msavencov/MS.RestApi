@@ -20,6 +20,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
         var options = context.Options;
         var conventions = options.ServerConventions;
         var useMediator = options.GenerateControllers == GenerateControllers.WithMediator;
+        var comparer = SymbolEqualityComparer.Default;
         
         if (useMediator && symbols.IMediator is null)
         {
@@ -59,6 +60,16 @@ internal class AddControllers : IMiddleware<ApiGenContext>
                         
                         cb.WriteLine($"/// <inheritdoc cref=\"{requestType}\"/>");
                         cb.WriteLine($"[{methodAttribute}, {routeAttribute}(\"{options.GetRoute(action.Endpoint)}\")]");
+
+                        foreach (var property in request.GetMembers().OfType<IPropertySymbol>())
+                        {
+                            if (comparer.Equals(property.Type, symbols.IAttachment) || comparer.Equals(property.Type, symbols.AttachmentsCollection))
+                            {
+                                var binderAttribute = symbols.BindFormFileAttribute;
+                                cb.WriteLine($"[]");
+                            }
+                        }
+                        
                         cb.WriteLine($"public {action.ReturnType} {actionMethodName}({routeArgumentsList}[{fromAttribute}] {requestType} model, {symbols.CancellationToken.ToDisplayString()} token)");
                         cb.WriteBlock(mb =>
                         {
