@@ -10,18 +10,18 @@ using MS.RestApi.Abstractions;
 namespace MS.RestApi.Server.Filters;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class BindFormFileAttribute(string modelPropertyName, string parameterName) : Attribute, IAsyncActionFilter
+public class BindFormFileAttribute(string parameterName, string propertyName) : Attribute, IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var model = context.ActionArguments[parameterName];
         var modelType = model.GetType();
-        var modelProperty = modelType.GetProperty(modelPropertyName)!;
-        var http = context.HttpContext;
+        var modelProperty = modelType.GetProperty(propertyName)!;
+        var formFiles = context.HttpContext.Request.Form.Files;
         
         if (modelProperty.PropertyType == typeof(AttachmentsCollection))
         {
-            var files = http.Request.Form.Files.Where(t => t.Name == modelProperty.Name).Select(t => new FromFileAttachment(t));
+            var files = formFiles.Where(t => t.Name == modelProperty.Name).Select(t => new FromFileAttachment(t));
             if (modelProperty.GetValue(model, []) is AttachmentsCollection modelAttachments)
             {
                 modelAttachments.AddRange(files);
@@ -34,7 +34,7 @@ public class BindFormFileAttribute(string modelPropertyName, string parameterNam
 
         if (modelProperty.PropertyType == typeof(IAttachment))
         {
-            if (http.Request.Form.Files.FirstOrDefault(t => t.Name == modelProperty.Name) is var file)
+            if (formFiles.FirstOrDefault(t => t.Name == modelProperty.Name) is var file)
             {
                 modelProperty.SetValue(model, new FromFileAttachment(file));
             }

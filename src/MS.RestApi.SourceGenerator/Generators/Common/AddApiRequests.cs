@@ -30,7 +30,7 @@ internal class AddApiRequests : IMiddleware<ApiGenContext>
                 var service = (string)attribute.ConstructorArguments[1].Value!;
                 var endpoint = (string)attribute.ConstructorArguments[0].Value!;
 
-                context.AddRequest(service, new ApiRequestDescriptor
+                context.AddRequest(service, new ApiRequestDescriptor(symbols)
                 {
                     Service = service,
                     Endpoint = endpoint,

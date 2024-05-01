@@ -25,6 +25,7 @@ public static class CompilationFactory
             typeof(object).Assembly,
             assemblies.First(t => t.GetName().Name == "netstandard"),
             assemblies.First(t => t.GetName().Name == "System.Runtime"),
+            assemblies.First(t => t.GetName().Name == "System.Collections"),
         ];
     }
 
@@ -53,7 +54,7 @@ public static class CompilationFactory
         var dependencies = new[]
         {
             typeof(IApiRequest), typeof(DependencyInjectionExtensions), typeof(IRequestHandler),
-            typeof(Binder),typeof(ControllerBase), typeof(IServiceCollection), typeof(MediatR.IRequest), typeof(IMediator), typeof(IServiceProvider)
+            typeof(Binder),typeof(ControllerBase), typeof(IServiceCollection), typeof(MediatR.IRequest), typeof(IMediator), typeof(IServiceProvider),
         }.Select(t => t.Assembly);
         var references = DefaultReferences().Union(dependencies).Select(t => MetadataReference.CreateFromFile(t.Location)).Union([contract]);
         var syntaxTrees = source.Select(t => CSharpSyntaxTree.ParseText(t));

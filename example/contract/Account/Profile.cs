@@ -15,9 +15,14 @@ namespace contract.Account
         public required int Id { get; set; }
 
         /// <summary>
-        /// 
+        /// User name
         /// </summary>
         public string Name { get; set; }
+        
+        /// <summary/>
+        public IAttachment Avatar { get; set; }
+        
+        public AttachmentsCollection 
     }
     
     ///

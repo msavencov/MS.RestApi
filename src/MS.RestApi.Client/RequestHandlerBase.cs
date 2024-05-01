@@ -20,14 +20,14 @@ public class RequestHandlerBase : IRequestHandler
         Client = client;
     }
     
-    public async Task HandleAsync<TModel>(string resource, TModel model, CancellationToken ct)
+    public async Task HandleAsync<TModel>(IRequestBuilder message, CancellationToken ct = default)
     {
-        await ExecuteAsync(resource, model, ct);
+        await ExecuteAsync(message, ct);
     }
 
-    public async Task<TResult> HandleAsync<TModel, TResult>(string resource, TModel model, CancellationToken ct)
+    public async Task<TResult> HandleAsync<TModel, TResult>(IRequestBuilder message, CancellationToken ct = default)
     {
-        var response = await ExecuteAsync(resource, model, ct);
+        var response = await ExecuteAsync(message, ct);
         var responseBody = await response.Content.ReadAsStringAsync();
 
         if (typeof(TResult) == typeof(string))
@@ -47,14 +47,10 @@ public class RequestHandlerBase : IRequestHandler
         }
     }
 
-    private async Task<HttpResponseMessage> ExecuteAsync(string resource, object model, CancellationToken ct)
+    private async Task<HttpResponseMessage> ExecuteAsync(IRequestBuilder builder, CancellationToken ct)
     {
-        var body = JsonConvert.SerializeObject(model); 
-        var message = new HttpRequestMessage(HttpMethod.Post, resource)
-        {
-            Content = new JsonContent(body),
-        };
-
+        var message = builder.GetRequestMessage();
+        
         await OnRequestMessageSendingAsync(message);
 
         var response = await Client.SendAsync(message, ct);
@@ -100,11 +96,8 @@ public class RequestHandlerBase : IRequestHandler
 
         throw new ApiRequestException($"The API response received `{response.StatusCode}: {response.ReasonPhrase}` is not implemented.")
         {
-            RequestUrl = message.RequestUri.AbsoluteUri,
-            RequestBody = body,
-            ResponseCode = (int) response.StatusCode,
-            ResponsePhrase = response.ReasonPhrase,
-            ResponseBody = responseBody
+            Request = message,
+            Response = response,
         };
     }
         
