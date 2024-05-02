@@ -20,16 +20,19 @@ public class BindFormFileAttribute(string parameterName, string propertyName) : 
         var modelProperty = modelType.GetProperty(propertyName)!;
         var formFiles = context.HttpContext.Request.Form.Files;
         
-        if (modelProperty.PropertyType == typeof(AttachmentsCollection))
+        if (typeof(IEnumerable<IAttachment>).IsAssignableFrom(modelProperty.PropertyType))
         {
             var files = formFiles.Where(t => t.Name == modelProperty.Name).Select(t => new FromFileAttachment(t));
-            if (modelProperty.GetValue(model, []) is AttachmentsCollection modelAttachments)
+            if (modelProperty.GetValue(model, []) is ICollection<IAttachment> modelAttachments)
             {
-                modelAttachments.AddRange(files);
+                foreach (var file in files)
+                {
+                    modelAttachments.Add(file);
+                }
             }
             else
             {
-                modelProperty.SetValue(model, new AttachmentsCollection(files));
+                modelProperty.SetValue(model, new List<IAttachment>(files));
             }
         }
 
@@ -46,14 +49,10 @@ public class BindFormFileAttribute(string parameterName, string propertyName) : 
 
     private class FromFileAttachment(IFormFile file) : IAttachment
     {
-        public string FileName { get; set; } = file.FileName;
-        public string? ContentType { get; set; } = file.ContentType;
-        public long? ContentLength { get; set; } = file.Length;
-        
-        public Stream GetFileStream()
-        {
-            return file.OpenReadStream();
-        }
+        public string GetFileName() => file.Name;
+        public string? GetContentType() => file.ContentType ?? "application/octet-stream";
+        public long? GetContentLength() => file.Length;
+        public Stream GetFileStream() => file.OpenReadStream();
     }
 }
 

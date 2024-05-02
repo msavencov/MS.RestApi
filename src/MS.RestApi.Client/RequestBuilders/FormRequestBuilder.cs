@@ -76,17 +76,17 @@ public class FormRequestBuilder(RequestFactory factory, object model, Dictionary
         {
             var content = new StreamContent(attachment.GetFileStream());
             
-            if (attachment.ContentLength is {} contentLength)
+            if (attachment.GetContentLength() is {} contentLength)
             {
                 content.Headers.ContentLength = contentLength;
             }
 
-            if (attachment.ContentType is { } contentType)
+            if (attachment.GetContentType() is { } contentType)
             {
                 content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
             }
             
-            form.Add(content, path, attachment.FileName);
+            form.Add(content, path, attachment.GetFileName());
             return true;
         }
         

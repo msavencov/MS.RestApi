@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MS.RestApi.Server.Filters;
 
-namespace server.Models;
+namespace server;
 
 [ApiController, Route("my")]
 public class MyController : ControllerBase

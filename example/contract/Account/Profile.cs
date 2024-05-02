@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using MediatR;
 using MS.RestApi.Abstractions;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -24,7 +26,7 @@ namespace contract.Account
         public IAttachment Avatar { get; set; }
 
         /// <summary/>
-        public AttachmentsCollection Documents { get; set; }
+        public List<IAttachment> Documents { get; set; } = new();
         
         /// <summary/>
         public ProfileData Inner { get; set; }
@@ -34,7 +36,9 @@ namespace contract.Account
     {
         public string Name { get; set; }
         public IAttachment Doc { get; set; }
-        public AttachmentsCollection AttachmentsCollection { get; set; } = new();
+        
+        [Required]
+        public List<IAttachment> AttachmentsCollection { get; set; } = new();
     }
 
     ///

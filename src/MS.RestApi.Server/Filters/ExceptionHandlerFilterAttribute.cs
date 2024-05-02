@@ -48,7 +48,7 @@ public class ExceptionHandlerFilterAttribute : ExceptionFilterAttribute
         {
             error = apiException.ApiError;
         }
-            
+        
         if (error == null)
         {
             foreach (var handler in _handlers)

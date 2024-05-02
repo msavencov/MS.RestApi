@@ -18,8 +18,26 @@ internal class CustomApiDescriptionProvider(IModelMetadataProvider metadataProvi
             (
                 from pd in apiDescription.ParameterDescriptions
                 where pd.ModelMetadata.ContainerType == typeof(IAttachment)
-                select pd
+                let name = pd.Name[.. pd.Name.LastIndexOf('.')]
+                select (name, pd, pd.ModelMetadata.ContainerType)
             ).ToList();
+
+            foreach (var attachment in attachments)
+            {
+                apiDescription.ParameterDescriptions.Remove(attachment.pd);
+            }
+
+            foreach (var (name, containerType) in attachments.Select(t=>(t.name, t.ContainerType)).Distinct())
+            {
+                var parameterDescription = new ApiParameterDescription
+                {
+                    Name = name,
+                    Type = containerType,
+                    ModelMetadata = metadataProvider.GetMetadataForType(containerType),
+                    Source = BindingSource.Form,
+                };
+                apiDescription.ParameterDescriptions.Add(parameterDescription);
+            }
             
             foreach (var parameterDescription in apiDescription.ParameterDescriptions)
             {
@@ -27,17 +45,19 @@ internal class CustomApiDescriptionProvider(IModelMetadataProvider metadataProvi
                 {
                     parameterDescription.Type = typeof(IFormFile[]);
                     parameterDescription.ModelMetadata = metadataProvider.GetMetadataForType(typeof(IFormFile[]));
-                    continue;
-                }
-                
-                if (typeof(IEnumerable<IAttachment>).IsAssignableFrom(parameterDescription.Type))
+                } 
+                else if (typeof(IEnumerable<IAttachment>).IsAssignableFrom(parameterDescription.Type))
                 {
                     parameterDescription.Type = typeof(IFormFile);
-                    parameterDescription.ModelMetadata = metadataProvider.GetMetadataForType(typeof(IFormFile));
-                    continue;
+                    parameterDescription.ModelMetadata = metadataProvider.GetMetadataForType(typeof(IFormFile)); 
                 }
             }
         }
+    }
+
+    private bool IsAttachment(Type type)
+    {
+        return typeof(IAttachment).IsAssignableFrom(type) || typeof(IEnumerable<IAttachment>).IsAssignableFrom(type);
     }
 
     public void OnProvidersExecuted(ApiDescriptionProviderContext context)
@@ -45,5 +65,5 @@ internal class CustomApiDescriptionProvider(IModelMetadataProvider metadataProvi
         
     }
 
-    public int Order { get; } = 0;
+    public int Order { get; } = -900; // between DefaultApiDescriptionProvider and EndpointMetadataApiDescriptionProvider
 }

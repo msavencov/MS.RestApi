@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -22,20 +23,20 @@ namespace client
             var services = BuildServiceProvider();
             var accountApi = services.GetRequiredService<IAccountApi>();
 
-            var fi = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ РКП.docx");
-            var fi2 = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ-РКП-MS.docx");
-            var fi3 = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ-РКП-MS-Answers.docx");
+            FileInfoAttachment fi = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ РКП.docx");
+            FileInfoAttachment fi2 = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ-РКП-MS.docx");
+            FileInfoAttachment fi3 = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ-РКП-MS-Answers.docx");
             var model = new Profile
             {
                 Id = 1,
                 Name = "sadsad",
-                Avatar = Attachment.FromFile(fi),
-                Documents = new AttachmentsCollection(new Attachment[]{fi2, fi3}),
+                Avatar = fi,
+                Documents = {fi2, fi3}, 
                 Inner = new ProfileData
                 {
                     Name = "2312131",
-                    Doc = (Attachment)fi,
-                    AttachmentsCollection = {(Attachment)fi, (Attachment)fi3}
+                    Doc = fi,
+                    AttachmentsCollection = {fi, fi3}
                 }
             };
             try
