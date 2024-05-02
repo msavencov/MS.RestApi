@@ -5,7 +5,10 @@ using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text;
 using MS.RestApi.Abstractions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MS.RestApi.Client.RequestBuilders;
 
@@ -14,84 +17,91 @@ public class FormRequestBuilder(RequestFactory factory, object model, Dictionary
     public HttpRequestMessage GetRequestMessage()
     {
         var content = new MultipartFormDataContent();
-        var type = model.GetType();
-
-        AddProperties(content, model);
+        var serializer = new JsonSerializerSettings
+        {
+            Converters = { new AttachmentConverter() }
+        };
+        var json = JsonConvert.SerializeObject(model, serializer);
         
-        
-        
+        content.Add(new StringContent(json, Encoding.UTF8, "application/json"));
         
         return factory.CreateRequestMessage(content);
     }
 
-    private void AddProperties(MultipartFormDataContent content, object input)
+    private void AddAttachments(MultipartFormDataContent content, JToken value)
     {
-        foreach (var property in input.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+        
+    }
+
+    private void AddProperties(MultipartFormDataContent form, object value, string path = "")
+    {
+        foreach (var property in value.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
-            var value = property.GetValue(model);
-            var attachments = new List<(string file, StreamContent content)>();
-            
-            if (value is IAttachment attachment)
+            if (TryAddContent(form, property.GetValue(value), $"{path}{property.Name}"))
             {
-                var streamContent = new StreamContent(attachment.GetFileStream() )
-                {
-                    Headers =
-                    {
-                        ContentType = new MediaTypeHeaderValue(attachment.ContentType),
-                        ContentLength = attachment.ContentLength,
-                    }
-                };
-                attachments.Add((attachment.FileName, streamContent));
-            }
-            
-            \\\
-            
-            foreach (var item in GetHttpContent(value))
-            {
-                content.Add(item);
+                continue;
             }
         }
     }
-
-    private IEnumerable<HttpContent> GetHttpContent(object? value)
+    
+    
+    private bool TryAddContent(MultipartFormDataContent form, object? value, string path)
     {
         if (value is null)
         {
-            yield break;
-        }
-     
-        var propertyType = value.GetType();
-            
-        if (value is string s)
-        {
-            yield return new StringContent(s);
+            return false;
         }
 
-        if (IsDate(propertyType))
+        var type = value.GetType();
+        
+        if (value is string s)
         {
-            yield return new StringContent(((IFormattable)value).ToString("o", CultureInfo.InvariantCulture));
+            form.Add(new StringContent(s), path);
+            return true;
+        }
+
+        if (IsDate(type))
+        {
+            form.Add(new StringContent(((IFormattable)value).ToString("o", CultureInfo.InvariantCulture)), path);
+            return true;
         }
 
         if (value is IFormattable formattable)
         {
-            yield return new StringContent(formattable.ToString(null, CultureInfo.InvariantCulture));
+            form.Add(new StringContent(formattable.ToString(null, CultureInfo.InvariantCulture)), path);
+            return true;
         }
 
         if (value is IAttachment attachment)
         {
-            yield return new StreamContent(attachment.GetFileStream());
+            var content = new StreamContent(attachment.GetFileStream());
+            
+            if (attachment.ContentLength is {} contentLength)
+            {
+                content.Headers.ContentLength = contentLength;
+            }
+
+            if (attachment.ContentType is { } contentType)
+            {
+                content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+            }
+            
+            form.Add(content, path, attachment.FileName);
+            return true;
         }
         
         if (value is IEnumerable enumerable)
         {
+            var i = 0; 
             foreach (var inner in enumerable)
             {
-                foreach (var innerContent in GetHttpContent(inner))
-                {
-                    yield return innerContent;
-                }
+                TryAddContent(form, inner, path);
             }
+
+            return true;
         }
+
+        return false;
     }
 
     private bool IsDate(Type type)
@@ -105,7 +115,7 @@ public class FormRequestBuilder(RequestFactory factory, object model, Dictionary
         {
             return true;
         }
-
+        
         return false;
     }
 

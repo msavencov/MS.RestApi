@@ -14,6 +14,7 @@ public static class DependencyInjectionExtensions
         services.Configure<MvcOptions>(options =>
         {
             options.Filters.Add<ExceptionHandlerFilterAttribute>();
+            options.ModelBinderProviders.Add(new MultipartModelBinderProvider());
         });
         services.Configure<ApiBehaviorOptions>(options =>
         {

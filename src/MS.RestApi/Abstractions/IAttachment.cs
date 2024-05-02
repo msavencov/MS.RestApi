@@ -18,7 +18,7 @@ public sealed class AttachmentsCollection : List<IAttachment>
 public interface IAttachment 
 {
     public string FileName { get; set; }
-    public string ContentType { get; set; }
-    public long ContentLength { get; set; }
+    public string? ContentType { get; set; }
+    public long? ContentLength { get; set; }
     public Stream GetFileStream();
 }

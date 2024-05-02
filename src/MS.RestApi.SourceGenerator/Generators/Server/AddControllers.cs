@@ -66,7 +66,7 @@ internal class AddControllers : IMiddleware<ApiGenContext>
 
                         fromAttribute ??= fromBodyAttribute.ToDisplayString();
                         
-                        cb.WriteLine($"public {action.ReturnType} {actionMethodName}({routeArgumentsList}[{fromAttribute}] {requestType} {model}, {symbols.CancellationToken.ToDisplayString()} token)");
+                        cb.WriteLine($"public {action.ReturnType} {actionMethodName}({routeArgumentsList}[{fromAttribute}, ] {requestType} {model}, {symbols.CancellationToken.ToDisplayString()} token)");
                         cb.WriteBlock(mb =>
                         {
                             if (request.IsRecord)

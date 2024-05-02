@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MS.RestApi.Abstractions;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace contract.Account
 {
@@ -21,10 +22,21 @@ namespace contract.Account
         
         /// <summary/>
         public IAttachment Avatar { get; set; }
+
+        /// <summary/>
+        public AttachmentsCollection Documents { get; set; }
         
-        public AttachmentsCollection 
+        /// <summary/>
+        public ProfileData Inner { get; set; }
     }
-    
+
+    public class ProfileData
+    {
+        public string Name { get; set; }
+        public IAttachment Doc { get; set; }
+        public AttachmentsCollection AttachmentsCollection { get; set; } = new();
+    }
+
     ///
     public class ProfileDto {}
 }

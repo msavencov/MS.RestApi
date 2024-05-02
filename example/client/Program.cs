@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using client.GeneratedApi.Extensions;
 using client.GeneratedApi.Services;
 using Microsoft.Extensions.DependencyInjection;
 using contract.Account;
+using MS.RestApi.Abstractions;
 using MS.RestApi.Client;
 
 [assembly: MS.RestApi.ApiGenOptions(ContractAssembly = "contract", ApiName = "GeneratedApi", RootNamespace = "client", GenerateClient = true)]
@@ -20,14 +22,25 @@ namespace client
             var services = BuildServiceProvider();
             var accountApi = services.GetRequiredService<IAccountApi>();
 
-            var model = new SignInLocal
+            var fi = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ РКП.docx");
+            var fi2 = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ-РКП-MS.docx");
+            var fi3 = new FileInfo(@"C:\Users\maxim.savencov\Documents\DAAC\Procur\ДТЗ-РКП-MS-Answers.docx");
+            var model = new Profile
             {
-                Password = "dasdasd",
-                Username = "ad@ad@ad",
+                Id = 1,
+                Name = "sadsad",
+                Avatar = Attachment.FromFile(fi),
+                Documents = new AttachmentsCollection(new Attachment[]{fi2, fi3}),
+                Inner = new ProfileData
+                {
+                    Name = "2312131",
+                    Doc = (Attachment)fi,
+                    AttachmentsCollection = {(Attachment)fi, (Attachment)fi3}
+                }
             };
             try
             {
-                var result = await accountApi.SignInLocal(model, CancellationToken.None);
+                var result = await accountApi.Profile(model, CancellationToken.None);
             }
             catch (Exception e)
             {

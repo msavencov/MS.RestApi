@@ -3,9 +3,9 @@ using System.Net.Http.Headers;
 
 namespace MS.RestApi.Client;
 
-public class JsonContent : StringContent
+public class MyJsonContent : StringContent
 {
-    public JsonContent(string content) : base(content)
+    public MyJsonContent(string content) : base(content)
     {
         Headers.ContentType = new MediaTypeHeaderValue("application/json");
     }

@@ -68,7 +68,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
 
             foreach (var routeParameter in action.GetRouteParameters())
             {
-                mw.WriteLine($"parameters.Add({routeParameter.Name}, model.{routeParameter.Name});");
+                mw.WriteLine($"parameters.Add({routeParameter.Name.Quote()}, model.{routeParameter.Name});");
             }
             
             mw.WriteLine($"var factory = new {factory}({method.Quote()}, {resource.Quote()}, parameters);");
@@ -94,7 +94,7 @@ internal class AddClientImplementation : IMiddleware<ApiGenContext>
                 handlerTypeArgs += $", {response.ToDisplayString()}";
             }
 
-            mw.WriteLine($"return handler.HandleAsync<{handlerTypeArgs}>({resource.Quote()}, model, token);");
+            mw.WriteLine($"return handler.HandleAsync<{handlerTypeArgs}>({builder}, token);");
         });
     }
 }

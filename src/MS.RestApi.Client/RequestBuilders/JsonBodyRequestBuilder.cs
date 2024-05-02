@@ -8,7 +8,7 @@ public class JsonBodyRequestBuilder(RequestFactory factory, object model) : IReq
     public HttpRequestMessage GetRequestMessage()
     {
         var serialized = JsonConvert.SerializeObject(model);
-        var content = new JsonContent(serialized);
+        var content = new MyJsonContent(serialized);
 
         return factory.CreateRequestMessage(content);
     }

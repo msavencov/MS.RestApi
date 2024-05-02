@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MS.RestApi.Abstractions;
 
 namespace MS.RestApi.Server.Filters;
@@ -46,8 +47,8 @@ public class BindFormFileAttribute(string parameterName, string propertyName) : 
     private class FromFileAttachment(IFormFile file) : IAttachment
     {
         public string FileName { get; set; } = file.FileName;
-        public string ContentType { get; set; } = file.ContentType;
-        public long ContentLength { get; set; } = file.Length;
+        public string? ContentType { get; set; } = file.ContentType;
+        public long? ContentLength { get; set; } = file.Length;
         
         public Stream GetFileStream()
         {
@@ -56,3 +57,22 @@ public class BindFormFileAttribute(string parameterName, string propertyName) : 
     }
 }
 
+public class MultipartModel : Attribute
+{
+    
+}
+
+public class MultipartModelBinder : IModelBinder
+{
+    public Task BindModelAsync(ModelBindingContext bindingContext)
+    {
+        return Task.CompletedTask;
+    }
+}
+public class MultipartModelBinderProvider : IModelBinderProvider
+{
+    public IModelBinder GetBinder(ModelBinderProviderContext context)
+    {
+        return null;
+    }
+}
